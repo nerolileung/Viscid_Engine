@@ -1,0 +1,63 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "clang++",
+			"type": "cppbuild",
+			"command": "/usr/bin/clang++",
+			"args": [
+				"-Wall",
+				"-std=c++17",
+				"-stdlib=libc++",
+				"-g",
+				"${workspaceFolder}/*.cpp",
+				"-o",
+				"${fileDirname}/${fileBasenameNoExtension}"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "cmake",
+			"type": "shell",
+			"command": "/usr/local/bin/cmake",
+			"args": [
+				"-G",
+				"Unix Makefiles",
+				"-DCMAKE_BUILD_TYPE=Debug",
+				".."
+			],
+			"options": {
+				"cwd": "${workspaceRoot}/build"
+			},
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "make",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"all"
+			],
+			"options": {
+				"cwd": "${workspaceRoot}/build"
+			},
+			"dependsOn": [
+				"cmake"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			]
+		}
+	]
+}
