@@ -10,9 +10,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-build/*
-build-win/x64-Clang-Debug-VS2019/
-
-build-win/x64-Clang-Debug-Ninja/
+build-osx/*
+build-win/*
 
 .vs/Viscid_Engine/v16/

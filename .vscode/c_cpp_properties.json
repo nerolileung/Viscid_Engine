@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/",
                 "${workspaceFolder}/MathFunctions",
-                "${workspaceFolder}/build"
+                "${workspaceFolder}/build-osx"
             ],
             "defines": [],
             "macFrameworkPath": [

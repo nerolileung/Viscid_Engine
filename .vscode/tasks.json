@@ -33,7 +33,7 @@
 				".."
 			],
 			"options": {
-				"cwd": "${workspaceRoot}/build"
+				"cwd": "${workspaceRoot}/build-osx"
 			},
 			"problemMatcher": [],
 			"group": "build"
@@ -46,7 +46,7 @@
 				"all"
 			],
 			"options": {
-				"cwd": "${workspaceRoot}/build"
+				"cwd": "${workspaceRoot}/build-osx"
 			},
 			"dependsOn": [
 				"cmake"
