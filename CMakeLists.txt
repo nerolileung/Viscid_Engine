@@ -4,20 +4,15 @@ cmake_minimum_required(VERSION 3.10)
 project(Viscid_Engine VERSION 0.01)
 enable_language(CXX)
 
-option(USE_MYMATH "Use CMake tutorial math library" ON)
-
-# conditional add library
-if(USE_MYMATH)
-    add_subdirectory(MathFunctions)
-    list(APPEND EXTRA_LIBS MathFunctions)
-endif()
-
 # add the executable
-add_executable(Viscid_Engine helloworld.cpp)
-
-target_link_libraries(Viscid_Engine PUBLIC ${EXTRA_LIBS})
+add_executable(Viscid_Engine main.cpp)
 
 configure_file(ViscidConfig.h.in ViscidConfig.h)
+
+# sdl
+add_library(SDL2 STATIC IMPORTED)
+set_target_properties(SDL2 PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SDL/libSDL2.a)
+target_link_libraries(Viscid_Engine INTERFACE SDL2)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 11)
@@ -31,6 +26,3 @@ target_include_directories(Viscid_Engine PUBLIC
                            )
 
 install(TARGETS Viscid_Engine DESTINATION bin)
-install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
-  DESTINATION include
-  )
