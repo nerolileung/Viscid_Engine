@@ -1,50 +1,28 @@
 #include "ViscidConfig.h"
-#include <SDL/SDL.h>
+#include "SDL.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    if (InitSDL()){
-        return 1;
-    }
-    return 0;
-}
+  SDL_Init(SDL_INIT_VIDEO);
 
-bool InitSDL() {
-	//setup SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) { //returns -1 on failure, 0 on success
-		cout << "SDL did not initialise. Error: " << SDL_GetError();
-		return false;
-	}
-	else {
-		//attempt to create window
-		gWindow = SDL_CreateWindow("Games Engine Creation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if (gWindow == NULL) {
-			cout << "Window was not created. Error: " << SDL_GetError();
-			return false;
-		}
-		gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED); //use rendering driver that supports hardware acceleration
-		if (gRenderer != NULL) {
-			//initialise png loading
-			int imageFlags = IMG_INIT_PNG;
-			if (!(IMG_Init(imageFlags) & imageFlags)) { //why &
-				cout << "SDL_Image initialisation failed. Error: " << IMG_GetError();
-				return false;
-			}
-			gTexture = new Texture2D(gRenderer);
-			if (!gTexture->LoadFromFile("Images/BackgroundMB.png")) {
-				return false;
-			}
-			if (gTexture == NULL) return false;
-			//initialise mixer
-			if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
-				cout << "Mixer initialisation failed. Error: " << Mix_GetError();
-				return false;
-			}
-		}
-		else {
-			cout << "Renderer could not initialise. Error: " << SDL_GetError();
-			return false;
-		}
-		return true;
-	}
+  SDL_Window *window = SDL_CreateWindow(
+    "SDL2Test",
+    SDL_WINDOWPOS_UNDEFINED,
+    SDL_WINDOWPOS_UNDEFINED,
+    640,
+    480,
+    0
+  );
+
+  SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+  SDL_RenderClear(renderer);
+  SDL_RenderPresent(renderer);
+
+  SDL_Delay(3000);
+
+  SDL_DestroyWindow(window);
+  SDL_Quit();
+
+  return 0;
 }
