@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/",
                 "${workspaceFolder}/includes",
+                "${workspaceFolder}/build-osx",
                 "/Library/Frameworks/"
             ],
             "defines": [],
