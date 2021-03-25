@@ -16,15 +16,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_COMPILER clang++)
 
 # sdl
+set(SDL2_EXTRA_LINK_FLAGS_STATIC "-lm -liconv  -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-weak_framework,CoreHaptics -Wl,-weak_framework,GameController -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,CoreVideo -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-weak_framework,QuartzCore -Wl,-weak_framework,Metal")
+
 add_library(SDL2::SDL2 STATIC IMPORTED)
-set_property(TARGET SDL2::SDL2 PROPERTY IMPORTED_LINK_INTERFACE_LANGUAGES "C")
-link_directories(SDL2::SDL2 "${PROJECT_SOURCE_DIR}/lib")
+set_target_properties(SDL2::SDL2 PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/include/SDL2"
+  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+  IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
 if (APPLE)
-  set_property(TARGET SDL2::SDL2 PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/libSDL2.a")
-  target_link_libraries(SDL2::SDL2 INTERFACE "${PROJECT_SOURCE_DIR}/lib/libSDL2.a")
-elseif (WIN32)
-  set_property(TARGET SDL2::SDL2 PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/SDL2.lib") 
-  target_link_libraries(SDL2::SDL2 INTERFACE "${PROJECT_SOURCE_DIR}/lib/SDL2.lib")
+  set_property(TARGET SDL2::SDL2 PROPERTY INTERFACE_LINK_LIBRARIES "${SDL2_EXTRA_LINK_FLAGS_STATIC}")
 endif()
 
 add_library(SDL2::SDL2main STATIC IMPORTED)
@@ -38,6 +39,6 @@ target_link_libraries(Viscid_Engine SDL2::SDL2main)
 target_include_directories(Viscid_Engine
 PUBLIC "${PROJECT_SOURCE_DIR}"
 PUBLIC "${PROJECT_BINARY_DIR}"
-PUBLIC "${PROJECT_SOURCE_DIR}/includes/")
+PUBLIC "${PROJECT_SOURCE_DIR}/include/")
 
 install(TARGETS Viscid_Engine DESTINATION bin)
