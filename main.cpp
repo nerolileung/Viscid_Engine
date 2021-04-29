@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
   // put a null event in the queue
   SDL_Event event;
-  // game loop
+  // game loop; event is always 1 and polling it updates the keyboard state
   while (SDL_PollEvent(&event) >= 0){
     // update loop; check if escape has been pressed
     const Uint8* keystate = SDL_GetKeyboardState(NULL);

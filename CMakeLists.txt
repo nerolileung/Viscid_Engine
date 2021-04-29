@@ -36,6 +36,10 @@ set_target_properties(SDL2::SDL2main PROPERTIES
 target_link_libraries(Viscid_Engine SDL2::SDL2)
 target_link_libraries(Viscid_Engine SDL2::SDL2main)
 
+if (WIN32)
+	file(COPY "${PROJECT_SOURCE_DIR}/lib/SDL2.dll" DESTINATION "${PROJECT_BINARY_DIR}/Debug")
+endif()
+
 target_include_directories(Viscid_Engine
 PUBLIC "${PROJECT_SOURCE_DIR}"
 PUBLIC "${PROJECT_BINARY_DIR}"
