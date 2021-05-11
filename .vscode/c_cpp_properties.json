@@ -4,7 +4,7 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/",
-                "${workspaceFolder}/include",
+                "${workspaceFolder}/framework/include",
                 "${workspaceFolder}/build-osx",
                 "/Library/Frameworks/"
             ],
