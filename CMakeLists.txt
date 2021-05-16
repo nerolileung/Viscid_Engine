@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.10)
 project(Viscid_Framework VERSION 0.01)
 enable_language(CXX)
 
+configure_file("${PROJECT_SOURCE_DIR}/framework/ViscidConfig.h.in" "${PROJECT_SOURCE_DIR}/framework/ViscidConfig.h")
+
 set (LOGO_PATH "${PROJECT_SOURCE_DIR}/data/logo.bmp")
 
 # add files to the executable
