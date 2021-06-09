@@ -6,6 +6,7 @@
                 "${workspaceFolder}/",
                 "${workspaceFolder}/framework/include",
                 "${workspaceFolder}/build-osx",
+                "${workspaceFolder}/build-osx/framework",
                 "/Library/Frameworks/"
             ],
             "defines": [],

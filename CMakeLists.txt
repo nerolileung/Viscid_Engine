@@ -21,6 +21,9 @@ endif()
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 Demo.h
 Demo.cpp
+framework/Logo.h
+framework/Logo.cpp
+data/icon.bmp
 )
 
 # specify the C++ standard
