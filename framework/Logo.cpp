@@ -2,15 +2,17 @@
 #include <string>
 #include <cmath>
 #include <iostream>
+#include "include/SDL2/SDL_image.h"
 
 Logo::Logo(const char* filepath, SDL_Renderer* aRenderer, float duration){
-    SDL_Surface* tempSurface = SDL_LoadBMP(filepath);
+    SDL_Surface* tempSurface = IMG_Load(filepath);
     image = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
     SDL_FreeSurface(tempSurface);
     finished = false;
     timerFreeze = duration;
-    timerFadeIn = 5.f;
-    timerFadeOut = 5.f;
+    // ignore these until we have png loading
+    timerFadeIn = 1.f;
+    timerFadeOut = 1.f;
 }
 
 Logo::~Logo(){
@@ -23,7 +25,7 @@ void Logo::Update(float deltaTime){
     // fade in logo 
     if (timerFadeIn > 0){
         timerFadeIn -= deltaTime;
-        alpha = std::ceil(255 * ((5.f-timerFadeIn)/5.f));
+        alpha = std::ceil(255 * ((1.f-timerFadeIn)/1.f));
         if (timerFadeIn < 0)
             alpha = 255;
     }
@@ -34,14 +36,13 @@ void Logo::Update(float deltaTime){
     // fade out logo
     else {
         timerFadeOut -= deltaTime;
-        alpha = std::floor(255 * (timerFadeOut/5.f));
+        alpha = std::floor(255 * (timerFadeOut/1.f));
         if (timerFadeOut < 0){
             alpha = 0;
             finished = true;
         }
     }
     SDL_SetTextureAlphaMod(image, alpha);
-    std::cout << alpha << std::endl;
 }
 
 void Logo::Render(SDL_Renderer* aRenderer){

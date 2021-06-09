@@ -1,3 +1,5 @@
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    Game.h
+framework/Game.h
+framework/Logo.h
+framework/Logo.cpp
 )

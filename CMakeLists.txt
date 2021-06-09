@@ -6,24 +6,22 @@ enable_language(CXX)
 
 configure_file("${PROJECT_SOURCE_DIR}/framework/ViscidConfig.h.in" "${PROJECT_SOURCE_DIR}/framework/ViscidConfig.h")
 
-set (LOGO_PATH "${PROJECT_SOURCE_DIR}/data/logo.bmp")
+set (LOGO_PATH "${PROJECT_SOURCE_DIR}/data/")
 
 # add files to the executable
+add_executable(${CMAKE_PROJECT_NAME} main.cpp ${LOGO_PATH})
 if (APPLE)
-  add_executable(${CMAKE_PROJECT_NAME} main.cpp ${LOGO_PATH})
   file(COPY ${LOGO_PATH} DESTINATION "${PROJECT_BINARY_DIR}/data")
 endif()
 if (WIN32)
-  add_executable(${CMAKE_PROJECT_NAME} main.cpp ${LOGO_PATH})
   file(COPY ${LOGO_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Debug/data")
 endif()
+
+add_subdirectory(framework)
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 Demo.h
 Demo.cpp
-framework/Logo.h
-framework/Logo.cpp
-data/icon.bmp
 )
 
 # specify the C++ standard
@@ -50,11 +48,18 @@ set_target_properties(SDL2::SDL2main PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES "C"
   IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2main${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
+# sdl_image
+add_library(SDL2::SDL2image STATIC IMPORTED)
+set_target_properties(SDL2::SDL2image PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+  IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_image${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2)
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2main)
+target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2image)
 
 if (WIN32)
-	file(COPY "${PROJECT_SOURCE_DIR}/framework/lib/SDL2.dll" DESTINATION "${PROJECT_BINARY_DIR}/Debug")
+	file(COPY "${PROJECT_SOURCE_DIR}/framework/lib/dll" DESTINATION "${PROJECT_BINARY_DIR}/Debug")
 endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME}

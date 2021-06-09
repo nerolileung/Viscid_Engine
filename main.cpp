@@ -1,8 +1,10 @@
 #include "ViscidConfig.h"
 #include "framework/include/SDL2/SDL.h"
+#include "framework/include/SDL2/SDL_image.h"
 #include <iostream>
-#include "Demo.h"
+#include <vector>
 #include "framework/Logo.h"
+#include "Demo.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,6 +23,9 @@ int main(int argc, char *argv[])
     exit(-1);
   }
 
+  // load support for .jpg and .png files
+	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+
   // create game instance
   Demo* demo = new Demo();
 
@@ -31,9 +36,8 @@ int main(int argc, char *argv[])
   float lastTime = (float)SDL_GetTicks() * 0.001f;
 
   // display logos
-  Logo* logos[] = {
-    new Logo("data/logo.bmp",renderer),
-  };
+  std::vector<Logo*> logos;
+  logos.push_back(new Logo("data/logo.png",renderer));
   int logoIndex = 0;
 
   // game loop; event is always 1 and polling it updates the keyboard state
@@ -43,7 +47,7 @@ int main(int argc, char *argv[])
     float deltaTime = currentTime - lastTime;
 
     // display logos
-    if (logoIndex < sizeof(logos)){
+    if (logoIndex < logos.size()){
       logos[logoIndex]->Update(deltaTime);
       SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
       SDL_RenderClear(renderer);
@@ -79,6 +83,7 @@ int main(int argc, char *argv[])
 
   // cleanup sdl
   SDL_DestroyWindow(window);
+  IMG_Quit();
   SDL_Quit();
 
   return 0;
