@@ -19,9 +19,11 @@ endif()
 
 add_subdirectory(framework)
 
+# game files
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-Demo.h
-Demo.cpp
+HatQuest.h
+HatQuest.cpp
+Scene.h
 )
 
 # specify the C++ standard

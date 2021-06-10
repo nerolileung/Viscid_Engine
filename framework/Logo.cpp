@@ -1,8 +1,8 @@
 #include "Logo.h"
 #include <string>
 #include <cmath>
-#include <iostream>
 #include "include/SDL2/SDL_image.h"
+#include "Game.h"
 
 Logo::Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath, float duration, float sfxOffset){
     // load image
@@ -28,7 +28,7 @@ Logo::~Logo(){
     delete image;
     image = nullptr;
     if (sfx != nullptr){
-        delete sfx;
+        Mix_FreeChunk(sfx);
         sfx = nullptr;
     }
 }
@@ -69,10 +69,10 @@ void Logo::Update(float deltaTime){
 }
 
 void Logo::Render(SDL_Renderer* aRenderer){
+    // center image on screen
     SDL_Rect position;
     SDL_QueryTexture(image,NULL,NULL,&position.w,&position.h);
-    // center image on screen
-    position.x = (640-position.w)/2;
-    position.y = (480-position.h)/2;
+    position.x = (Game::WindowWidth-position.w)/2;
+    position.y = (Game::WindowHeight-position.h)/2;
     SDL_RenderCopy(aRenderer,image,NULL,&position);
 }
