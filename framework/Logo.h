@@ -1,11 +1,12 @@
 #ifndef LOGO_H
 #define LOGO_H
 #include "include/SDL2/SDL.h"
+#include "include/SDL2/SDL_mixer.h"
 
 class Logo
 {
 public:
-    Logo(const char* filepath, SDL_Renderer* aRenderer, float duration = 3.f);
+    Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath = nullptr, float duration = 3.f, float sfxOffset = 1.f);
     ~Logo();
     void Update(float deltaTime);
     void Render(SDL_Renderer* aRenderer);
@@ -16,6 +17,9 @@ private:
     float timerFreeze;
     float timerFadeIn;
     float timerFadeOut;
+    Mix_Chunk* sfx;
+    float sfxTimestamp;
+    bool sfxPlayed;
 };
 
 #endif // LOGO_H

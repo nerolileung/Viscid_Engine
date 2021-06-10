@@ -4,23 +4,37 @@
 #include <iostream>
 #include "include/SDL2/SDL_image.h"
 
-Logo::Logo(const char* filepath, SDL_Renderer* aRenderer, float duration){
-    SDL_Surface* tempSurface = IMG_Load(filepath);
+Logo::Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath, float duration, float sfxOffset){
+    // load image
+    SDL_Surface* tempSurface = IMG_Load(imagePath);
     image = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
     SDL_FreeSurface(tempSurface);
+
+    // load audio (if present)
+    if (sfxPath != nullptr)
+        sfx = Mix_LoadWAV(sfxPath);
+    else sfx = nullptr;
+
+    // variables
     finished = false;
     timerFreeze = duration;
-    // ignore these until we have png loading
     timerFadeIn = 1.f;
     timerFadeOut = 1.f;
+    sfxTimestamp = sfxOffset;
+    sfxPlayed = false;
 }
 
 Logo::~Logo(){
     delete image;
     image = nullptr;
+    if (sfx != nullptr){
+        delete sfx;
+        sfx = nullptr;
+    }
 }
 
 void Logo::Update(float deltaTime){
+    // visuals
     int alpha = 255;
     // fade in logo 
     if (timerFadeIn > 0){
@@ -43,6 +57,15 @@ void Logo::Update(float deltaTime){
         }
     }
     SDL_SetTextureAlphaMod(image, alpha);
+    
+    // audio
+    if (sfx != nullptr){
+        sfxTimestamp -= deltaTime;
+        if (sfxTimestamp < 0 && !sfxPlayed){
+            Mix_PlayChannel(-1, sfx, 0);
+            sfxPlayed = true;
+        }
+    }
 }
 
 void Logo::Render(SDL_Renderer* aRenderer){

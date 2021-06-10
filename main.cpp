@@ -9,9 +9,9 @@
 int main(int argc, char *argv[])
 {
   // initialise sdl for graphics
-  if (SDL_Init(SDL_INIT_VIDEO) < 0){
-    std::cout << "Failed to initialise video!";
-    exit(-1);
+  if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0){
+    std::cout << "Failed to initialise SDL!";
+    return -1;
   }
 
   // create 640x480 window
@@ -20,11 +20,17 @@ int main(int argc, char *argv[])
   SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   if (!window){
     std::cout << "Failed to create window!";
-    exit(-1);
+    return -2;
   }
 
   // load support for .jpg and .png files
 	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+  // load support for .mp3 and .ogg files
+  Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
+  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
+		std::cout << "Failed to initialise SDL_mixer! Error: " << Mix_GetError();
+		return -3;
+	}
 
   // create game instance
   Demo* demo = new Demo();
@@ -37,7 +43,7 @@ int main(int argc, char *argv[])
 
   // display logos
   std::vector<Logo*> logos;
-  logos.push_back(new Logo("data/logo.png",renderer));
+  logos.push_back(new Logo("data/logo.png",renderer,"data/logo.wav"));
   int logoIndex = 0;
 
   // game loop; event is always 1 and polling it updates the keyboard state
@@ -83,6 +89,7 @@ int main(int argc, char *argv[])
 
   // cleanup sdl
   SDL_DestroyWindow(window);
+  Mix_Quit();
   IMG_Quit();
   SDL_Quit();
 
