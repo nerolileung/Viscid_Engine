@@ -24,6 +24,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 HatQuest.h
 HatQuest.cpp
 Scene.h
+SceneMainMenu.h
+SceneMainMenu.cpp
 )
 
 # specify the C++ standard
@@ -62,10 +64,21 @@ set_target_properties(SDL2::SDL2mixer PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES "C"
   IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_mixer${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
+# sdl_ttf
+add_library(SDL2::SDL2ttf STATIC IMPORTED)
+set(SDL_TTF_FREETYPE_FLAG "-L/opt/X11/lib -lfreetype")
+if (APPLE)
+  set_property(TARGET SDL2::SDL2ttf PROPERTY INTERFACE_LINK_LIBRARIES "${SDL_TTF_FREETYPE_FLAG}")
+endif()
+set_target_properties(SDL2::SDL2ttf PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+  IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_ttf${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2)
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2main)
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2image)
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2mixer)
+target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2ttf)
 
 if (WIN32)
 	file(COPY "${PROJECT_SOURCE_DIR}/framework/lib/dll" DESTINATION "${PROJECT_BINARY_DIR}/Debug")

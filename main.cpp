@@ -1,6 +1,8 @@
 #include "ViscidConfig.h"
 #include "framework/include/SDL2/SDL.h"
 #include "framework/include/SDL2/SDL_image.h"
+#include "framework/include/SDL2/SDL_mixer.h"
+#include "framework/include/SDL2/SDL_ttf.h"
 #include <iostream>
 #include <vector>
 #include "framework/Game.h"
@@ -10,7 +12,7 @@
 int main(int argc, char *argv[])
 {
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0){
-    std::cout << "Failed to initialise SDL!";
+    std::cout << "Failed to initialise SDL! Error:" << SDL_GetError();
     return -1;
   }
 
@@ -26,17 +28,21 @@ int main(int argc, char *argv[])
   // create renderer using first rendering driver with hardware acceleration
   SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   if (!window){
-    std::cout << "Failed to create window!";
+    std::cout << "Failed to create window! Error:" << SDL_GetError();
     return -2;
   }
 
-  // load extra file support from sdl_image and sdl_mixer
+  // initialise secondary sdl libraries
 	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
   Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
   if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
 		std::cout << "Failed to initialise SDL_mixer! Error: " << Mix_GetError();
 		return -3;
 	}
+  if (TTF_Init() < 0 ){
+    std::cout << "Failed to initialise SDL_ttf! Error:" << TTF_GetError();
+    return -4;
+  }
 
   // create instance of specific game here
   HatQuest* game = new HatQuest();
@@ -64,7 +70,7 @@ int main(int argc, char *argv[])
       logos[logoIndex]->Update(deltaTime);
       SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
       SDL_RenderClear(renderer);
-      logos[logoIndex]->Render(renderer);
+      logos[logoIndex]->Render(renderer, window);
       SDL_RenderPresent(renderer);
       if (logos[logoIndex]->IsFinished()) logoIndex++;
     }
@@ -96,6 +102,7 @@ int main(int argc, char *argv[])
 
   // cleanup sdl
   SDL_DestroyWindow(window);
+  TTF_Quit();
   Mix_Quit();
   IMG_Quit();
   SDL_Quit();

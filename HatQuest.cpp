@@ -1,13 +1,15 @@
 #include "HatQuest.h"
+#include "SceneMainMenu.h"
 
 HatQuest::HatQuest(){
     currentSceneType = MAIN_MENU;
     // todo main menu scene cast to general scene
-    currentScene = nullptr;
+    currentScene = (Scene*)(new SceneMainMenu());
     myLogo = nullptr;
 }
 HatQuest::~HatQuest(){
-
+    delete currentScene;
+    currentScene = nullptr;
 }
 
 bool HatQuest::Update(float deltaTime){
@@ -15,7 +17,6 @@ bool HatQuest::Update(float deltaTime){
     const Uint8* keystate = SDL_GetKeyboardState(NULL);
     if (keystate[SDL_SCANCODE_ESCAPE])
       paused = !paused;
-    
     // move to new scene
     if (currentScene->isFinished()){
         switch (currentSceneType){
@@ -37,12 +38,12 @@ bool HatQuest::Update(float deltaTime){
         }
     }
 
-    //currentScene->Update(deltaTime);
-
-    return true;
+    return currentScene->Update(deltaTime);
 }
 
 void HatQuest::Render(SDL_Renderer* aRenderer){
+    currentScene->Render(aRenderer);
+
     // load image if it hasn't loaded yet
     if (!myLogo){
         SDL_Surface* tempSurface = SDL_LoadBMP("data/icon.bmp");

@@ -9,7 +9,7 @@ public:
     Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath = nullptr, float duration = 3.f, float sfxOffset = 1.f);
     ~Logo();
     void Update(float deltaTime);
-    void Render(SDL_Renderer* aRenderer);
+    void Render(SDL_Renderer* aRenderer, SDL_Window* aWindow);
     bool IsFinished() { return finished; };
 private:
     bool finished;
