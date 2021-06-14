@@ -18,9 +18,9 @@ UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, float x
     SDL_Surface* tempSurface = IMG_Load(texturePath);
     myTexture = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
     SDL_FreeSurface(tempSurface);
-    myPosition.x = xPos;
-    myPosition.y = yPos;
     SDL_QueryTexture(myTexture,NULL,NULL,&myPosition.w,&myPosition.h);
+    myPosition.x = xPos - (myPosition.w / 2);
+    myPosition.y = yPos - (myPosition.h / 2);
 }
 
 UI_Element::~UI_Element(){

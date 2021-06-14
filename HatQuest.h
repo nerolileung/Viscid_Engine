@@ -2,7 +2,9 @@
 #define HATQUEST_H
 
 #include "framework/Game.h"
+#include "framework/include/SDL2/SDL_ttf.h"
 #include "Scene.h"
+#include <vector>
 
 class HatQuest : public Game
 {
@@ -23,6 +25,7 @@ private:
     bool initialisedScene;
     bool paused;
     void ChangeScene(SCENES newScene);
+    std::vector<TTF_Font*> fonts;
 };
 
 #endif // HATQUEST_H

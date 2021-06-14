@@ -1,15 +1,22 @@
 #include "HatQuest.h"
 #include "SceneMainMenu.h"
+#include <iostream>
 
 HatQuest::HatQuest(){
     currentSceneType = MAIN_MENU;
-    // todo main menu scene cast to general scene
     currentScene = (Scene*)(new SceneMainMenu());
     initialisedScene = false;
+    fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 200));
+    fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 50));
+    Scene::SetFonts(fonts);
 }
 HatQuest::~HatQuest(){
     delete currentScene;
     currentScene = nullptr;
+    for (int i = 0; i < 2; i++){
+        TTF_CloseFont(fonts[i]);
+        fonts[i] = nullptr;
+    }
 }
 
 bool HatQuest::Update(float deltaTime){

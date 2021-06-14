@@ -8,11 +8,12 @@ class SceneMainMenu : public Scene {
 public:
     SceneMainMenu();
     ~SceneMainMenu();
-    bool Init(SDL_Renderer* aRenderer);
-    bool Update(float deltaTime);
-    void Render(SDL_Renderer* aRenderer);
+    bool Init(SDL_Renderer* aRenderer) override;
+    bool Update(float deltaTime) override;
+    void Render(SDL_Renderer* aRenderer) override;
 private:
     UI_Element* myBackground;
+    SDL_Texture* myHeading;
 };
 
 #endif // SCENEMAINMENU_H
