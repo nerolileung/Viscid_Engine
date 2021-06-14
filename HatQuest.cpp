@@ -5,7 +5,7 @@ HatQuest::HatQuest(){
     currentSceneType = MAIN_MENU;
     // todo main menu scene cast to general scene
     currentScene = (Scene*)(new SceneMainMenu());
-    myLogo = nullptr;
+    initialisedScene = false;
 }
 HatQuest::~HatQuest(){
     delete currentScene;
@@ -42,26 +42,12 @@ bool HatQuest::Update(float deltaTime){
 }
 
 void HatQuest::Render(SDL_Renderer* aRenderer){
+    if (!initialisedScene) currentScene->Init(aRenderer);
     currentScene->Render(aRenderer);
-
-    // load image if it hasn't loaded yet
-    if (!myLogo){
-        SDL_Surface* tempSurface = SDL_LoadBMP("data/icon.bmp");
-        myLogo = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
-        SDL_FreeSurface(tempSurface);
-    }
-
-    // render image in the middle of the screen
-    SDL_Rect position;
-    SDL_QueryTexture(myLogo,NULL,NULL,&position.w,&position.h);
-    position.x = (WindowWidth-position.w)/2;
-    position.y = (WindowHeight-position.h)/2;
-
-    // pass image to renderer
-    SDL_RenderCopy(aRenderer,myLogo,NULL,&position);
 }
 
 void HatQuest::ChangeScene(SCENES newScene){
     // todo switch
     currentSceneType = newScene;
+    initialisedScene = false;
 }

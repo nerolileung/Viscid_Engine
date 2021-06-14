@@ -24,7 +24,7 @@ Logo::Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath, 
 }
 
 Logo::~Logo(){
-    delete image;
+    SDL_DestroyTexture(image);
     image = nullptr;
     if (sfx != nullptr){
         Mix_FreeChunk(sfx);

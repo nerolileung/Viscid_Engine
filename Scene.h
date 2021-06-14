@@ -5,6 +5,7 @@
 
 class Scene {
 public:
+    virtual bool Init(SDL_Renderer* aRenderer) = 0;
     virtual bool Update(float deltaTime) = 0;
     virtual void Render(SDL_Renderer* aRenderer) = 0;
     bool isFinished() {return myFinished; };

@@ -20,9 +20,9 @@ private:
     };
     SCENES currentSceneType;
     Scene* currentScene;
+    bool initialisedScene;
     bool paused;
     void ChangeScene(SCENES newScene);
-    SDL_Texture* myLogo;
 };
 
 #endif // HATQUEST_H

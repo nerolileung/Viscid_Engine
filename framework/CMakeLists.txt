@@ -3,4 +3,6 @@ framework/Game.h
 framework/Game.cpp
 framework/Logo.h
 framework/Logo.cpp
+framework/UI_Element.h
+framework/UI_Element.cpp
 )
