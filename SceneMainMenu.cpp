@@ -11,6 +11,8 @@ SceneMainMenu::~SceneMainMenu(){
     myBackground = nullptr;
     SDL_DestroyTexture(myHeading);
     myHeading = nullptr;
+    delete myQuitButton;
+    myQuitButton = nullptr;
 }
 
 bool SceneMainMenu::Init(SDL_Renderer* aRenderer){
@@ -22,12 +24,15 @@ bool SceneMainMenu::Init(SDL_Renderer* aRenderer){
     SDL_FreeSurface(headingSurface);
     if (myHeading == nullptr) return false;
 
+    myQuitButton = new UI_Button("Quit",gameFonts[1],gameFontColours[0],aRenderer,Game::WindowWidth/2, Game::WindowHeight*0.8f);
+    if (myQuitButton == nullptr) return false;
+
     return true;
 }
 
 bool SceneMainMenu::Update(float deltaTime){
-    // todo if quit button is pressed return false
-    return true;
+    myQuitButton->Update(deltaTime);
+    return !myQuitButton->isClicked();
 }
 
 void SceneMainMenu::Render(SDL_Renderer* aRenderer){
@@ -39,4 +44,6 @@ void SceneMainMenu::Render(SDL_Renderer* aRenderer){
     headingPos.w = Game::WindowWidth*0.4f;
     headingPos.h = Game::WindowHeight*0.15f;
     SDL_RenderCopy(aRenderer,myHeading,NULL,&headingPos);
+
+    myQuitButton->Render(aRenderer);
 }

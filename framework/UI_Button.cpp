@@ -3,33 +3,45 @@
 UI_Button::UI_Button(const char* texturePath, SDL_Renderer* aRenderer, float xPos, float yPos) : UI_Element(texturePath, aRenderer, xPos, yPos){
     myClicked = false;
     myHovering = false;
+
+    SDL_SetTextureAlphaMod(myTexture, 230);
 }
 
 UI_Button::UI_Button(const char* texturePath, SDL_Renderer* aRenderer, SDL_Rect aPosition) : UI_Element(texturePath, aRenderer){
     myPosition = aPosition;
     myPosition.x = aPosition.x - (aPosition.w / 2);
     myPosition.y = aPosition.y - (aPosition.h / 2);
+
     myClicked = false;
     myHovering = false;
+
+    SDL_SetTextureAlphaMod(myTexture, 230);
 }
 
 UI_Button::UI_Button(const char* text, TTF_Font* aFont, SDL_Color aFontColour, SDL_Renderer* aRenderer, float xPos, float yPos){
     SDL_Surface* tempSurface = TTF_RenderText_Blended(aFont,text,aFontColour);
     myText = SDL_CreateTextureFromSurface(aRenderer, tempSurface);
     SDL_FreeSurface(tempSurface);
+
     SDL_QueryTexture(myText,NULL,NULL,&myPosition.w,&myPosition.h);
     myPosition.x = xPos - (myPosition.w / 2);
-    myPosition.y = yPos - (myPosition.y / 2);
+    myPosition.y = yPos - (myPosition.h / 2);
     myClicked = false;
     myHovering = false;
+
+    SDL_SetTextureAlphaMod(myText, 230);
 }
 
 UI_Button::UI_Button(const char* texturePath, const char* text, TTF_Font* aFont, SDL_Color aFontColour, SDL_Renderer* aRenderer, float xPos, float yPos) : UI_Element(texturePath, aRenderer, xPos, yPos){
     SDL_Surface* tempSurface = TTF_RenderText_Blended(aFont,text,aFontColour);
     myText = SDL_CreateTextureFromSurface(aRenderer, tempSurface);
     SDL_FreeSurface(tempSurface);
+
     myClicked = false;
     myHovering = false;
+
+    SDL_SetTextureAlphaMod(myTexture, 230);
+    SDL_SetTextureAlphaMod(myText, 230);
 }
 
 UI_Button::~UI_Button(){
@@ -44,8 +56,28 @@ UI_Button::~UI_Button(){
 }
 
 void UI_Button::Update(float deltaTime){
-    // todo check for collisions
-    // todo set opacity based on hover state
+    SDL_Point mousePos;
+    SDL_GetMouseState(&mousePos.x, &mousePos.y);
+    if (SDL_PointInRect(&mousePos,&myPosition)){
+        if (!myHovering) {
+            myHovering = true;
+            if (myTexture != nullptr)
+                SDL_SetTextureAlphaMod(myTexture, 255);
+            if (myText != nullptr)
+                SDL_SetTextureAlphaMod(myText, 255);
+        }
+        if (SDL_GetMouseState(NULL,NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)){
+            myClicked = true;
+        }
+    }
+    else if (myHovering){
+        myHovering = false;
+        if (myTexture != nullptr)
+            SDL_SetTextureAlphaMod(myTexture, 230);
+        if (myText != nullptr)
+            SDL_SetTextureAlphaMod(myText, 230);
+    }
+
     // todo play sound effect when clicked
 }
 
@@ -60,6 +92,7 @@ void UI_Button::Render(SDL_Renderer* aRenderer){
         SDL_QueryTexture(myText,NULL,NULL,&myTextPosition.w,&myTextPosition.h);
         myTextPosition.x = myPosition.x + (myPosition.w/2) - (myTextPosition.w/2);
         myTextPosition.y = myPosition.y + (myPosition.h/2) - (myTextPosition.h/2);
+        
         SDL_RenderCopy(aRenderer, myText, NULL, &myTextPosition);
     }
 }

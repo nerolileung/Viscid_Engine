@@ -19,6 +19,7 @@ UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, float x
     myTexture = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
     SDL_FreeSurface(tempSurface);
     SDL_QueryTexture(myTexture,NULL,NULL,&myPosition.w,&myPosition.h);
+    // offset so given position is midpoint of element
     myPosition.x = xPos - (myPosition.w / 2);
     myPosition.y = yPos - (myPosition.h / 2);
 }

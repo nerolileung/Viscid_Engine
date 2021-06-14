@@ -6,9 +6,12 @@
 
 class UI_Button : public UI_Element {
 public:
+    // background image only
     UI_Button(const char* texturePath, SDL_Renderer* aRenderer, float xPos, float yPos);
     UI_Button(const char* texturePath, SDL_Renderer* aRenderer, SDL_Rect aPosition);
+    // text only
     UI_Button(const char* text, TTF_Font* aFont, SDL_Color aFontColour, SDL_Renderer* aRenderer, float xPos, float yPos);
+    // both
     UI_Button(const char* texturePath, const char* text, TTF_Font* aFont, SDL_Color aFontColour, SDL_Renderer* aRenderer, float xPos, float yPos);
 
     ~UI_Button();

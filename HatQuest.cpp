@@ -45,11 +45,19 @@ bool HatQuest::Update(float deltaTime){
         }
     }
 
-    return currentScene->Update(deltaTime);
+    if (initialisedScene)
+        return currentScene->Update(deltaTime);
+    else return true;
 }
 
 void HatQuest::Render(SDL_Renderer* aRenderer){
-    if (!initialisedScene) currentScene->Init(aRenderer);
+    if (!initialisedScene){
+        initialisedScene = currentScene->Init(aRenderer);
+        if (!initialisedScene) {
+            std::cout << "Error initialising scene!";
+            return;
+        }
+    }
     currentScene->Render(aRenderer);
 }
 

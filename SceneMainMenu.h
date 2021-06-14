@@ -3,6 +3,7 @@
 
 #include "Scene.h"
 #include "framework/UI_Element.h"
+#include "framework/UI_Button.h"
 
 class SceneMainMenu : public Scene {
 public:
@@ -14,6 +15,7 @@ public:
 private:
     UI_Element* myBackground;
     SDL_Texture* myHeading;
+    UI_Button* myQuitButton;
 };
 
 #endif // SCENEMAINMENU_H
