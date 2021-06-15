@@ -6,7 +6,7 @@
 #include "Scene.h"
 #include <vector>
 
-class HatQuest : public Game
+class HatQuest final : public Game
 {
 public:
     HatQuest();

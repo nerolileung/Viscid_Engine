@@ -17,13 +17,14 @@ int main(int argc, char *argv[])
   }
 
   // "fullscreen" window
-  SDL_Window *window = SDL_CreateWindow("HatQuest", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
+  SDL_Window *window = SDL_CreateWindow("HatQuest", 0, 0, 640, 480, SDL_WINDOW_MAXIMIZED);
   int displayIndex = SDL_GetWindowDisplayIndex(window);
   SDL_Rect dimensions;
   SDL_GetDisplayBounds(displayIndex, &dimensions);
   SDL_SetWindowSize(window, dimensions.w, dimensions.h);
   Game::WindowHeight = dimensions.h;
   Game::WindowWidth = dimensions.w;
+  bool windowMinimised = false;
 
   // create renderer using first rendering driver with hardware acceleration
   SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -61,6 +62,13 @@ int main(int argc, char *argv[])
 
   // game loop; event is always 1 and polling it updates the keyboard state
   while (SDL_PollEvent(&event) >= 0){
+    // restore window after un-minimising
+    if (event.window.event == SDL_WINDOWEVENT_MINIMIZED && !windowMinimised)
+      windowMinimised = true;
+    else if (event.window.event == SDL_WINDOWEVENT_RESIZED && windowMinimised){
+      SDL_RestoreWindow(window);
+      windowMinimised = false;
+    }
     // update time
     float currentTime = (float)SDL_GetTicks() * 0.001f;
     float deltaTime = currentTime - lastTime;
