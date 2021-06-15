@@ -24,6 +24,20 @@ UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, float x
     myPosition.y = yPos - (myPosition.h / 2);
 }
 
+UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, SDL_Rect aPosition, ASPECT_RATIO ratio){
+    SDL_Surface* tempSurface = IMG_Load(texturePath);
+    myTexture = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
+    SDL_FreeSurface(tempSurface);
+    // scale element based on given ratio and dimensions
+    SDL_QueryTexture(myTexture,NULL,NULL,&myPosition.w,&myPosition.h);
+    myPosition = aPosition;
+    if (ratio == ASPECT_RATIO::HEIGHT) myPosition.w *= aPosition.h/myPosition.h;
+    else if (ratio == ASPECT_RATIO::WIDTH) myPosition.h *= aPosition.w/myPosition.w;
+    // offset so given position is midpoint of element
+    myPosition.x = aPosition.x - (myPosition.w / 2);
+    myPosition.y = aPosition.y - (myPosition.h / 2);
+}
+
 UI_Element::~UI_Element(){
     if (myTexture != nullptr){
         SDL_DestroyTexture(myTexture);

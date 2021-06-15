@@ -16,6 +16,7 @@ private:
     UI_Element* myBackground;
     SDL_Texture* myHeading;
     UI_Button* myQuitButton;
+    UI_Button* myPlayButton;
 };
 
 #endif // SCENEMAINMENU_H
