@@ -33,12 +33,13 @@ bool SceneLevel::Update(float deltaTime){
     if (myPaused){
         // update pause menu ui and nothing else
         // if return to main menu button is pressed, set finished
+        // if quit button is pressed, return false
     }
     else {
         UpdateBackgroundColour(deltaTime);
         // move world
         myPlayer->Update(deltaTime);
-        myFinished = myPlayer->isDead();
+        myFinished = myPlayer->isDead(); // todo start ghost animation
     }
     return true;
 }

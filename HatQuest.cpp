@@ -34,8 +34,11 @@ HatQuest::~HatQuest(){
 bool HatQuest::Update(float deltaTime){
     //pause on escape
     const Uint8* keystate = SDL_GetKeyboardState(NULL);
-    if (keystate[SDL_SCANCODE_ESCAPE])
-      myPaused = !myPaused;
+    if (keystate[SDL_SCANCODE_ESCAPE]){
+        myPaused = !myPaused;
+        if (myCurrentSceneType == SCENES::PLAYING)
+            ((SceneLevel*)myCurrentScene)->SetPaused(myPaused);
+    }
     // move to new scene
     if (myCurrentScene->isFinished()){
         switch (myCurrentSceneType){

@@ -11,11 +11,19 @@ public:
     Character();
     ~Character();
     bool Init(SDL_Renderer* aRenderer, int unitSize);
-    bool Update(float deltaTime);
+    void Update(float deltaTime);
     void Render(SDL_Renderer* aRenderer);
-    bool isDead() { return myDead; };
+    bool isDead() { return myState == PLAYER_STATE::DEAD; };
 private:
-    bool myDead;
+    enum PLAYER_STATE {
+        RUNNING = 0,
+        JUMPING = 2,
+        SLIDING = 4,
+        DEAD = 6
+    };
+    PLAYER_STATE myState;
+    void ChangeState(PLAYER_STATE aState);
+    bool InitSprites(SDL_Renderer* aRenderer);
     std::vector<std::unique_ptr<UI_Element>> mySprites;
     int myCurrentSpriteIndex;
     float mySpriteTimerCurrent;
