@@ -1,5 +1,6 @@
 #include "HatQuest.h"
 #include "SceneMainMenu.h"
+#include "SceneLevel.h"
 #include <iostream>
 
 HatQuest::HatQuest(){
@@ -11,7 +12,17 @@ HatQuest::HatQuest(){
     Scene::SetFonts(fonts);
 }
 HatQuest::~HatQuest(){
-    delete currentScene;
+    switch (currentSceneType){
+        case MAIN_MENU:
+            delete (SceneMainMenu*)currentScene;
+        break;
+        case PLAYING:
+            delete (SceneLevel*)currentScene;
+        break;
+        default:
+            delete currentScene;
+        break;
+    }
     currentScene = nullptr;
     for (int i = 0; i < 2; i++){
         TTF_CloseFont(fonts[i]);
@@ -31,8 +42,7 @@ bool HatQuest::Update(float deltaTime){
             ChangeScene(PLAYING);
             break;
             case PLAYING:
-            // todo get data from scene
-            ChangeScene(WIN);
+            ChangeScene(((SceneLevel*)currentScene)->GetNextScene());
             break;
             case WIN:
             case LOSE:
@@ -61,8 +71,32 @@ void HatQuest::Render(SDL_Renderer* aRenderer){
     currentScene->Render(aRenderer);
 }
 
-void HatQuest::ChangeScene(SCENES newScene){
-    // todo switch
-    currentSceneType = newScene;
+void HatQuest::ChangeScene(SCENES newSceneType){
+    // allow changing to current scene for reloading
+    if (currentScene != nullptr){
+        switch (currentSceneType){
+            case MAIN_MENU:
+                delete (SceneMainMenu*)currentScene;
+            break;
+            case PLAYING:
+                delete (SceneLevel*)currentScene;
+            break;
+            default:
+                delete currentScene;
+            break;
+        }
+    }
+    switch (newSceneType){
+        case MAIN_MENU:
+            currentScene = (Scene*)(new SceneMainMenu());
+        break;
+        case PLAYING:
+            currentScene = (Scene*)(new SceneLevel());
+        break;
+        default: //todo
+            currentScene = nullptr;
+        break;
+    }
+    currentSceneType = newSceneType;
     initialisedScene = false;
 }

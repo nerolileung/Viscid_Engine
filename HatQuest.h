@@ -13,18 +13,18 @@ public:
     ~HatQuest();
     bool Update(float deltaTime);
     void Render(SDL_Renderer* aRenderer);
-private:
     enum SCENES {
         MAIN_MENU = 0,
         PLAYING,
         WIN,
         LOSE
     };
+private:
     SCENES currentSceneType;
     Scene* currentScene;
     bool initialisedScene;
     bool paused;
-    void ChangeScene(SCENES newScene);
+    void ChangeScene(SCENES newSceneType);
     std::vector<TTF_Font*> fonts;
 };
 
