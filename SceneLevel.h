@@ -16,6 +16,9 @@ public:
 private:
     bool myPaused;
     bool myPlayerDead;
+    float myBackgroundColour[3];
+    int myBackgroundColourChange[3];
+    void UpdateBackgroundColour(float deltaTime);
 };
 
 #endif // SCENELEVEL_H
