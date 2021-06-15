@@ -3,6 +3,7 @@
 
 #include "Scene.h"
 #include "HatQuest.h"
+#include "Character.h"
 
 class SceneLevel : public Scene {
 public:
@@ -15,10 +16,11 @@ public:
     HatQuest::SCENES GetNextScene();
 private:
     bool myPaused;
-    bool myPlayerDead;
+    Character* myPlayer;
     float myBackgroundColour[3];
     int myBackgroundColourChange[3];
     void UpdateBackgroundColour(float deltaTime);
+    int myTileSize;
 };
 
 #endif // SCENELEVEL_H

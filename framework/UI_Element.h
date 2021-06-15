@@ -20,6 +20,8 @@ public:
     ~UI_Element();
     virtual void Update(float deltaTime);
     virtual void Render(SDL_Renderer* aRenderer);
+    void SetPosition(SDL_Point aPosition);
+    SDL_Rect GetDimensions() { return myPosition; };
 protected:
     SDL_Texture* myTexture;
     SDL_Rect myPosition;

@@ -4,26 +4,27 @@
 #include <iostream>
 
 HatQuest::HatQuest(){
-    currentSceneType = MAIN_MENU;
-    currentScene = (Scene*)(new SceneMainMenu());
+    myCurrentSceneType = MAIN_MENU;
+    myCurrentScene = (Scene*)(new SceneMainMenu());
     initialisedScene = false;
+    myPaused = false;
     fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 200));
     fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 50));
     Scene::SetFonts(fonts);
 }
 HatQuest::~HatQuest(){
-    switch (currentSceneType){
+    switch (myCurrentSceneType){
         case MAIN_MENU:
-            delete (SceneMainMenu*)currentScene;
+            delete (SceneMainMenu*)myCurrentScene;
         break;
         case PLAYING:
-            delete (SceneLevel*)currentScene;
+            delete (SceneLevel*)myCurrentScene;
         break;
         default:
-            delete currentScene;
+            delete myCurrentScene;
         break;
     }
-    currentScene = nullptr;
+    myCurrentScene = nullptr;
     for (int i = 0; i < 2; i++){
         TTF_CloseFont(fonts[i]);
         fonts[i] = nullptr;
@@ -34,15 +35,15 @@ bool HatQuest::Update(float deltaTime){
     //pause on escape
     const Uint8* keystate = SDL_GetKeyboardState(NULL);
     if (keystate[SDL_SCANCODE_ESCAPE])
-      paused = !paused;
+      myPaused = !myPaused;
     // move to new scene
-    if (currentScene->isFinished()){
-        switch (currentSceneType){
+    if (myCurrentScene->isFinished()){
+        switch (myCurrentSceneType){
             case MAIN_MENU:
             ChangeScene(PLAYING);
             break;
             case PLAYING:
-            ChangeScene(((SceneLevel*)currentScene)->GetNextScene());
+            ChangeScene(((SceneLevel*)myCurrentScene)->GetNextScene());
             break;
             case WIN:
             case LOSE:
@@ -56,47 +57,48 @@ bool HatQuest::Update(float deltaTime){
     }
 
     if (initialisedScene)
-        return currentScene->Update(deltaTime);
+        return myCurrentScene->Update(deltaTime);
     else return true;
 }
 
 void HatQuest::Render(SDL_Renderer* aRenderer){
     if (!initialisedScene){
-        initialisedScene = currentScene->Init(aRenderer);
+        initialisedScene = myCurrentScene->Init(aRenderer);
         if (!initialisedScene) {
             std::cout << "Error initialising scene!";
             return;
         }
     }
-    currentScene->Render(aRenderer);
+    myCurrentScene->Render(aRenderer);
 }
 
 void HatQuest::ChangeScene(SCENES newSceneType){
     // allow changing to current scene for reloading
-    if (currentScene != nullptr){
-        switch (currentSceneType){
+    if (myCurrentScene != nullptr){
+        switch (myCurrentSceneType){
             case MAIN_MENU:
-                delete (SceneMainMenu*)currentScene;
+                delete (SceneMainMenu*)myCurrentScene;
             break;
             case PLAYING:
-                delete (SceneLevel*)currentScene;
+                delete (SceneLevel*)myCurrentScene;
             break;
             default:
-                delete currentScene;
+                delete myCurrentScene;
             break;
         }
     }
     switch (newSceneType){
         case MAIN_MENU:
-            currentScene = (Scene*)(new SceneMainMenu());
+            myCurrentScene = (Scene*)(new SceneMainMenu());
         break;
         case PLAYING:
-            currentScene = (Scene*)(new SceneLevel());
+            myCurrentScene = (Scene*)(new SceneLevel());
         break;
         default: //todo
-            currentScene = nullptr;
+            myCurrentScene = nullptr;
         break;
     }
-    currentSceneType = newSceneType;
+    myCurrentSceneType = newSceneType;
     initialisedScene = false;
+    myPaused = false;
 }

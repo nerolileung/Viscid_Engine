@@ -20,10 +20,10 @@ public:
         LOSE
     };
 private:
-    SCENES currentSceneType;
-    Scene* currentScene;
+    SCENES myCurrentSceneType;
+    Scene* myCurrentScene;
     bool initialisedScene;
-    bool paused;
+    bool myPaused;
     void ChangeScene(SCENES newSceneType);
     std::vector<TTF_Font*> fonts;
 };

@@ -4,19 +4,28 @@
 SceneLevel::SceneLevel(){
     myFinished = false;
     myPaused = false;
+
     myBackgroundColour[0] = 28.f - std::rand()%4;
     myBackgroundColour[1] = 150.f + std::rand()%20;
     myBackgroundColour[2] = 201.f - std::rand()%50;
     myBackgroundColourChange[0] = 5;
     myBackgroundColourChange[1] = 10;
     myBackgroundColourChange[2] = -10;
+
+    myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
+    myPlayer = new Character();
+    // todo tile pool
 }
 
 SceneLevel::~SceneLevel(){
+    delete myPlayer;
+    myPlayer = nullptr;
 }
 
 bool SceneLevel::Init(SDL_Renderer* aRenderer){
-    myPlayerDead = false;
+    myPlayer->Init(aRenderer,myTileSize);
+    if (myPlayer == nullptr) return false;
+
     return true;
 }
 
@@ -27,8 +36,9 @@ bool SceneLevel::Update(float deltaTime){
     }
     else {
         UpdateBackgroundColour(deltaTime);
-
-        // game logic
+        // move world
+        myPlayer->Update(deltaTime);
+        myFinished = myPlayer->isDead();
     }
     return true;
 }
@@ -74,7 +84,10 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
     // background changes colour
     SDL_SetRenderDrawColor(aRenderer, myBackgroundColour[0], myBackgroundColour[1], myBackgroundColour[2], SDL_ALPHA_OPAQUE);
     SDL_RenderClear(aRenderer);
+
     // render regular screen
+    myPlayer->Render(aRenderer);
+
     if (myPaused){
         // render pause menu ui
     }
@@ -82,6 +95,6 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
 
 HatQuest::SCENES SceneLevel::GetNextScene(){
     if (myPaused) return HatQuest::SCENES::MAIN_MENU;
-    if (myPlayerDead) return HatQuest::SCENES::LOSE;
+    if (myPlayer->isDead()) return HatQuest::SCENES::LOSE;
     else return HatQuest::SCENES::WIN;
 }

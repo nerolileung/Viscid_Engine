@@ -29,6 +29,8 @@ SceneMainMenu.h
 SceneMainMenu.cpp
 SceneLevel.h
 SceneLevel.cpp
+Character.h
+Character.cpp
 )
 
 # specify the C++ standard
