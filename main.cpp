@@ -65,8 +65,9 @@ int main(int argc, char *argv[])
     // restore window after un-minimising
     if (event.window.event == SDL_WINDOWEVENT_MINIMIZED && !windowMinimised)
       windowMinimised = true;
-    else if (event.window.event == SDL_WINDOWEVENT_RESIZED && windowMinimised){
+    else if (event.window.event == SDL_WINDOWEVENT_RESTORED && windowMinimised){
       SDL_RestoreWindow(window);
+      SDL_MaximizeWindow(window);
       windowMinimised = false;
     }
     // update time
