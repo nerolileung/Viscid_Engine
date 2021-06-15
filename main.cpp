@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
   }
 
   // initialise secondary sdl libraries
-	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+  IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
   Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
   if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
 		std::cout << "Failed to initialise SDL_mixer! Error: " << Mix_GetError();

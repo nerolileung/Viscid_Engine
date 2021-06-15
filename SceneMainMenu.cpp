@@ -27,20 +27,18 @@ bool SceneMainMenu::Init(SDL_Renderer* aRenderer){
     SDL_FreeSurface(headingSurface);
     if (myHeading == nullptr) return false;
 
-    //SDL_Rect quitPosition {(int)(Game::WindowWidth*0.7f), (int)(Game::WindowHeight*0.6f), (int)(Game::WindowWidth*0.2f), (int)(Game::WindowWidth*0.2f)};
-    myQuitButton = new UI_Button("data/mainmenu_button.png","Quit",gameFonts[1],gameFontColours[0],aRenderer, Game::WindowWidth*0.7f,Game::WindowHeight*0.7f);
-    if (myQuitButton == nullptr) return false;
-
-    //SDL_Rect playPosition {(int)(Game::WindowWidth*0.3f), (int)(Game::WindowHeight*0.4f), (int)(Game::WindowWidth*0.2f), (int)(Game::WindowWidth*0.2f)};
     myPlayButton = new UI_Button("data/mainmenu_button.png","Play",gameFonts[1],gameFontColours[0],aRenderer,Game::WindowWidth*0.3f, Game::WindowHeight*0.5f);
     if (myPlayButton == nullptr) return false;
+
+    myQuitButton = new UI_Button("data/mainmenu_button.png","Quit",gameFonts[1],gameFontColours[0],aRenderer, Game::WindowWidth*0.7f,Game::WindowHeight*0.7f);
+    if (myQuitButton == nullptr) return false;
 
     return true;
 }
 
 bool SceneMainMenu::Update(float deltaTime){
-    myQuitButton->Update(deltaTime);
     myPlayButton->Update(deltaTime);
+    myQuitButton->Update(deltaTime);
     if (myPlayButton->isClicked()) myFinished = true;
     return !myQuitButton->isClicked();
 }
@@ -56,6 +54,6 @@ void SceneMainMenu::Render(SDL_Renderer* aRenderer){
     headingPos.w = Game::WindowWidth*0.3f;
     SDL_RenderCopy(aRenderer,myHeading,NULL,&headingPos);
 
-    myQuitButton->Render(aRenderer);
     myPlayButton->Render(aRenderer);
+    myQuitButton->Render(aRenderer);
 }

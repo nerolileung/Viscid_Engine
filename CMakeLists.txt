@@ -6,15 +6,15 @@ enable_language(CXX)
 
 configure_file("${PROJECT_SOURCE_DIR}/framework/ViscidConfig.h.in" "${PROJECT_SOURCE_DIR}/framework/ViscidConfig.h")
 
-set (LOGO_PATH "${PROJECT_SOURCE_DIR}/data/")
+set (ASSET_PATH "${PROJECT_SOURCE_DIR}/data")
 
 # add files to the executable
-add_executable(${CMAKE_PROJECT_NAME} main.cpp ${LOGO_PATH})
+add_executable(${CMAKE_PROJECT_NAME} main.cpp ${ASSET_PATH})
 if (APPLE)
-  file(COPY ${LOGO_PATH} DESTINATION "${PROJECT_BINARY_DIR}/data")
+  file(COPY ${ASSET_PATH} DESTINATION "${PROJECT_BINARY_DIR}/")
 endif()
 if (WIN32)
-  file(COPY ${LOGO_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Debug/data")
+  file(COPY ${ASSET_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Debug/")
 endif()
 
 add_subdirectory(framework)
@@ -82,7 +82,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2mixer)
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2ttf)
 
 if (WIN32)
-	file(COPY "${PROJECT_SOURCE_DIR}/framework/lib/dll" DESTINATION "${PROJECT_BINARY_DIR}/Debug")
+	file(COPY "${PROJECT_SOURCE_DIR}/framework/lib/dll/" DESTINATION "${PROJECT_BINARY_DIR}/Debug")
 endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME}
