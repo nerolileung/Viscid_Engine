@@ -13,7 +13,7 @@ public:
     bool Init(SDL_Renderer* aRenderer, int unitSize);
     void Update(float deltaTime);
     void Render(SDL_Renderer* aRenderer);
-    bool isDead() { return myState == PLAYER_STATE::DEAD; };
+    bool isDead();
 private:
     enum PLAYER_STATE {
         RUNNING = 0,
@@ -27,7 +27,7 @@ private:
     std::vector<std::unique_ptr<UI_Element>> mySprites;
     int myCurrentSpriteIndex;
     float mySpriteTimerCurrent;
-    const float mySpriteTimerMax = 1.f;
+    const float mySpriteTimerMax = 0.3f;
     int gameUnit;
     SDL_Rect myPosition;
 };

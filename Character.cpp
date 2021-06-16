@@ -2,7 +2,6 @@
 #include "framework/Game.h"
 
 Character::Character(){
-    myState = PLAYER_STATE::RUNNING;
     myCurrentSpriteIndex = 0;
     mySpriteTimerCurrent = mySpriteTimerMax;
 }
@@ -19,6 +18,7 @@ bool Character::Init(SDL_Renderer* aRenderer, int unitSize){
     myPosition.y = (gameUnit * 7) - (myPosition.h / 2);
     
     if (!InitSprites(aRenderer)) return false;
+    ChangeState(PLAYER_STATE::RUNNING);
 
     return true;
 }
@@ -44,14 +44,7 @@ void Character::Update(float deltaTime){
 
     // handle vertical movement
 
-    // fell
-    if (myPosition.y < Game::WindowHeight - (myPosition.h/2))
-        ChangeState(PLAYER_STATE::DEAD);
-
-    // hit a wall
-    bool hasCollided = false;
-    // todo get tiles adjacent to player and check collisions
-    if (hasCollided) ChangeState(PLAYER_STATE::DEAD);
+    if (isDead()) ChangeState(PLAYER_STATE::DEAD);
 }
 
 void Character::Render(SDL_Renderer* aRenderer){
@@ -61,8 +54,7 @@ void Character::Render(SDL_Renderer* aRenderer){
 void Character::ChangeState(PLAYER_STATE aState){
     switch (aState){
         case PLAYER_STATE::RUNNING:
-            myPosition.w = gameUnit;
-            myPosition.h = gameUnit * 5 / 3;
+            myPosition = mySprites[0]->GetDimensions();
             myPosition.x = (gameUnit * 2) - (myPosition.w / 2);
             myPosition.y = (gameUnit * 7) - (myPosition.h / 2);
             mySprites[0]->SetPosition({myPosition.x,myPosition.y});
@@ -78,4 +70,18 @@ void Character::ChangeState(PLAYER_STATE aState){
     }
     myState = aState;
     myCurrentSpriteIndex = myState;
+}
+
+bool Character::isDead(){
+    // avoid redoing calculations
+    if (myState == PLAYER_STATE::DEAD) return true;
+
+    // fell
+    if (myPosition.y > Game::WindowHeight - (myPosition.h/2))
+        return true;
+
+    // hit a wall
+    bool hasCollided = false;
+    // todo get tiles adjacent to player and check collisions based on sprite rectangles
+    return hasCollided;
 }
