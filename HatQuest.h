@@ -16,8 +16,7 @@ public:
     enum SCENES {
         MAIN_MENU = 0,
         PLAYING,
-        WIN,
-        LOSE
+        END
     };
 private:
     SCENES myCurrentSceneType;

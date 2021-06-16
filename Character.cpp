@@ -3,6 +3,7 @@
 
 Character::Character(){
     myCurrentSpriteIndex = 0;
+    mySpriteTimerMax = 0.3f;
     mySpriteTimerCurrent = mySpriteTimerMax;
 }
 

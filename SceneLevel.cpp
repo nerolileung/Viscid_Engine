@@ -13,31 +13,43 @@ SceneLevel::SceneLevel(){
     myBackgroundColourChange[2] = -10;
 
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
+    mySpeed = 0.5f;
+
     myPlayer = new Character();
-    // todo tile pool
+    myTilePooler = new TilePooler();
 }
 
 SceneLevel::~SceneLevel(){
     delete myPlayer;
     myPlayer = nullptr;
+
+    delete myTilePooler;
+    myTilePooler = nullptr;
 }
 
 bool SceneLevel::Init(SDL_Renderer* aRenderer){
     myPlayer->Init(aRenderer,myTileSize);
     if (myPlayer == nullptr) return false;
 
+    myTilePooler->Init(aRenderer, myTileSize);
+    if (myTilePooler == nullptr) return false;
+
     return true;
 }
 
 bool SceneLevel::Update(float deltaTime){
+    // todo peek event and pause if window is minimised
+
     if (myPaused){
         // update pause menu ui and nothing else
         // if return to main menu button is pressed, set finished
         // if quit button is pressed, return false
+        // if restart button is pressed, set finished and unpause
     }
     else {
         UpdateBackgroundColour(deltaTime);
-        // move world
+        // generate more map and allocate tiles
+        myTilePooler->Update(deltaTime, mySpeed);
         myPlayer->Update(deltaTime);
         myFinished = myPlayer->isDead(); // todo start ghost animation
     }
@@ -87,6 +99,7 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
     SDL_RenderClear(aRenderer);
 
     // render regular screen
+    myTilePooler->Render(aRenderer);
     myPlayer->Render(aRenderer);
 
     if (myPaused){
@@ -96,6 +109,6 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
 
 HatQuest::SCENES SceneLevel::GetNextScene(){
     if (myPaused) return HatQuest::SCENES::MAIN_MENU;
-    if (myPlayer->isDead()) return HatQuest::SCENES::LOSE;
-    else return HatQuest::SCENES::WIN;
+    if (myPlayer->isDead()) return HatQuest::SCENES::END;
+    else return HatQuest::SCENES::PLAYING;
 }

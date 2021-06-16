@@ -31,6 +31,10 @@ SceneLevel.h
 SceneLevel.cpp
 Character.h
 Character.cpp
+Tile.h
+Tile.cpp
+TilePooler.h
+TilePooler.cpp
 )
 
 # specify the C++ standard

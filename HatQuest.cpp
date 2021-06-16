@@ -48,8 +48,7 @@ bool HatQuest::Update(float deltaTime){
             case PLAYING:
             ChangeScene(((SceneLevel*)myCurrentScene)->GetNextScene());
             break;
-            case WIN:
-            case LOSE:
+            case END:
             // todo get data from scene
             ChangeScene(MAIN_MENU);
             break;

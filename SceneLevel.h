@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "HatQuest.h"
 #include "Character.h"
+#include "TilePooler.h"
 
 class SceneLevel : public Scene {
 public:
@@ -21,6 +22,8 @@ private:
     int myBackgroundColourChange[3];
     void UpdateBackgroundColour(float deltaTime);
     int myTileSize;
+    TilePooler* myTilePooler;
+    float mySpeed;
 };
 
 #endif // SCENELEVEL_H
