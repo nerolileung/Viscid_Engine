@@ -8,10 +8,13 @@ TilePooler::TilePooler(){
 
 TilePooler::~TilePooler(){
     myTiles.clear();
-    for (int i = 0; i < sizeof(myTileSprites); i++){
-        SDL_DestroyTexture(myTileSprites[i]);
-        myTileSprites[i] = nullptr;
-    }
+    // todo switch this to a std::array if more sheets are added
+    SDL_DestroyTexture(myTileSprites[0]);
+    myTileSprites[0] = nullptr;
+    SDL_DestroyTexture(myTileSprites[1]);
+    myTileSprites[1] = nullptr;
+    SDL_DestroyTexture(myTileSprites[2]);
+    myTileSprites[2] = nullptr;
 }
 
 bool TilePooler::Init(SDL_Renderer* aRenderer, int tileSize, int maxTileWidth){

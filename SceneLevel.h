@@ -6,6 +6,7 @@
 #include "Character.h"
 #include "TilePooler.h"
 #include <vector>
+#include <array>
 
 class SceneLevel : public Scene {
 public:
@@ -25,8 +26,8 @@ private:
     int myTileSize;
     int myTileMaxX;
     TilePooler* myTilePooler;
-    bool myUpcomingTiles[3][8];
-    std::vector<bool[8]> myUpcomingPiece;
+    std::array<unsigned char,3> myUpcomingTiles;
+    std::vector<unsigned char> myUpcomingPattern;
     float myTileAdvanceCounter;
     void AdvanceTiles();
     void UpdateUpcomingTiles();

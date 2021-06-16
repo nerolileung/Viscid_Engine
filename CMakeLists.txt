@@ -35,6 +35,8 @@ Tile.h
 Tile.cpp
 TilePooler.h
 TilePooler.cpp
+TilePatterns.h
+TilePatterns.cpp
 )
 
 # specify the C++ standard

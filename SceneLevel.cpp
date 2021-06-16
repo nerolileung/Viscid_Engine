@@ -1,6 +1,6 @@
 #include "SceneLevel.h"
 #include <cmath>
-#include <initializer_list>
+#include "TilePatterns.h"
 
 SceneLevel::SceneLevel(){
     myFinished = false;
@@ -14,11 +14,9 @@ SceneLevel::SceneLevel(){
     myBackgroundColourChange[2] = -10;
 
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
+    TilePatterns::Init();
     for (int i = 0; i < 3; i++){
-        for (int j = 0; j < 7; j++){
-            myUpcomingTiles[i][j] = false;
-        }
-        myUpcomingTiles[i][7] = true;
+        myUpcomingTiles[i] = TilePatterns::GetRow(7);
     }
     mySpeed = 0.3f;
 
@@ -117,58 +115,43 @@ void SceneLevel::UpdateBackgroundColour(float deltaTime){
 }
 
 void SceneLevel::UpdateUpcomingTiles(){
-    for (int i = 0; i < 8; i++){
-        myUpcomingTiles[0][i] = myUpcomingTiles[1][i];
-        myUpcomingTiles[1][i] = myUpcomingTiles[2][i];
+    myUpcomingTiles[0] = myUpcomingTiles[1];
+    myUpcomingTiles[1] = myUpcomingTiles[2];
+
+    if (myUpcomingPattern.empty()){
+        // avoid the empty pattern at 0
+        int patternIndex = 1 + std::rand()%(TilePatterns::size()-1);
+        // todo do cool logic combining pieces/doing certain amounts of low/mid/high pieces
+        myUpcomingPattern = TilePatterns::GetPattern((TilePatterns::PATTERNS)patternIndex);
     }
 
-    if (myUpcomingPiece.empty()){
-        // todo more interesting pieces; consider making an enum or separate class if this gets really complicated. maybe bitmasking for extra spiciness? read them from a file?
-        int pieceIndex = std::rand()%2;
-        switch (pieceIndex){
-            case 0: // three floor tiles, nothing else
-                myUpcomingPiece.push_back(
-                    {false,false,false,false,false,false,false,true});
-                myUpcomingPiece.push_back(
-                    {false,false,false,false,false,false,false,true});
-                myUpcomingPiece.push_back(
-                    {false,false,false,false,false,false,false,true});
-            break;
-            case 1: // a floor tile on either side of a two-tile gap
-                myUpcomingPiece.push_back(
-                    {false,false,false,false,false,false,false,true});
-                myUpcomingPiece.push_back(
-                    {false,false,false,false,false,false,false,false});
-                myUpcomingPiece.push_back(
-                    {false,false,false,false,false,false,false,false});
-                myUpcomingPiece.push_back(
-                    {false,false,false,false,false,false,false,true});
-            break;
-            default: // a column with top and bottom tiles;
-                myUpcomingPiece.push_back({true,false,false,false,false,false,false,true});
-            break;
-        }
-    }
-    for (int i = 0; i < 8; i++)
-        myUpcomingTiles[2][i] = myUpcomingPiece[0][i];
-    myUpcomingPiece.erase(myUpcomingPiece.begin(),myUpcomingPiece.begin()+1);
+    myUpcomingTiles[2] = myUpcomingPattern[0];
+    myUpcomingPattern.erase(myUpcomingPattern.begin(),myUpcomingPattern.begin()+1);
 }
 
 void SceneLevel::AdvanceTiles(){
     for (int i = 0; i < 8; i++){
+        // is there a tile here?
+        int FlagToCheck = TilePatterns::GetRow(i);
+        if ((myUpcomingTiles[1] & FlagToCheck) == 0) continue;
+
         // determine sprite based on adjacent tiles
+        int UpperFlagToCheck = TilePatterns::GetRow(i-1);
+        int LowerFlagToCheck = TilePatterns::GetRow(i+1);
+
         int index = 0;
-        if (!myUpcomingTiles[0][i]) // left empty
+        if ((myUpcomingTiles[0] & FlagToCheck) == 0) // left empty
             index += 1;
-        if (!myUpcomingTiles[2][i]) // right empty
+        if ((myUpcomingTiles[2] & FlagToCheck) == 0) // right empty
             index += 2;
-        if (i == 0 || !myUpcomingTiles[1][i - 1]) // up
+        if (i == 0 || ((myUpcomingTiles[1] & UpperFlagToCheck) == 0)) // up
             index += 4;
-        if (i == 7 || !myUpcomingTiles[1][i + 1]) // down
+        if (i == 7 || ((myUpcomingTiles[1] & LowerFlagToCheck) == 0)) // down
             index += 8;
 
-        SDL_Point spritePosition = { i % 4, (i - (i % 4)) / 4};
-        myTilePooler->SetFreeTile({myTileMaxX, i*myTileSize},spritePosition);
+        // put new tile at far right of the screen
+        SDL_Point spritePosition = { myTileSize * (i % 4), myTileSize * ((i - (i % 4)) / 4)};
+        myTilePooler->SetFreeTile({(myTileMaxX+1)*myTileSize, i*myTileSize},spritePosition);
     }
 }
 
