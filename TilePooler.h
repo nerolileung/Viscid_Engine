@@ -11,7 +11,7 @@ public:
     ~TilePooler();
     void Update(float deltaTime, float speed);
     void Render(SDL_Renderer* aRenderer);
-    bool Init(SDL_Renderer* aRenderer, int tileSize);
+    bool Init(SDL_Renderer* aRenderer, int tileSize, int maxTileWidth);
     bool SetFreeTile(SDL_Point aPosition, SDL_Point aSprite);
     Tile* GetTileAt(SDL_Point aPosition);
 private:

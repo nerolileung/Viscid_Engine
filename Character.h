@@ -5,16 +5,18 @@
 #include "framework/UI_Element.h"
 #include <vector>
 #include <memory>
+#include "TilePooler.h"
 
 class Character {
 public:
     Character();
     ~Character();
-    bool Init(SDL_Renderer* aRenderer, int unitSize);
+    bool Init(SDL_Renderer* aRenderer, int unitSize, TilePooler* aTilePooler);
     void Update(float deltaTime);
     void Render(SDL_Renderer* aRenderer);
     bool isDead();
     void SetSpeed(float speed) { mySpriteTimerMax = speed; };
+    int GetFarRight() { return myPosition.x + (myPosition.w / 2); };
 private:
     enum PLAYER_STATE {
         RUNNING = 0,
@@ -28,9 +30,11 @@ private:
     std::vector<std::unique_ptr<UI_Element>> mySprites;
     int myCurrentSpriteIndex;
     float mySpriteTimerCurrent;
-    float mySpriteTimerMax;
+    float mySpriteTimerMax; // used for general speed too
     int gameUnit;
     SDL_Rect myPosition;
+    TilePooler* tilePooler;
+    void UpdatePosition(float deltaTime);
 };
 
 #endif // CHARACTER_H

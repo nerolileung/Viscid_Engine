@@ -5,6 +5,7 @@
 #include "HatQuest.h"
 #include "Character.h"
 #include "TilePooler.h"
+#include <vector>
 
 class SceneLevel : public Scene {
 public:
@@ -22,7 +23,13 @@ private:
     int myBackgroundColourChange[3];
     void UpdateBackgroundColour(float deltaTime);
     int myTileSize;
+    int myTileMaxX;
     TilePooler* myTilePooler;
+    bool myUpcomingTiles[3][8];
+    std::vector<bool[8]> myUpcomingPiece;
+    float myTileAdvanceCounter;
+    void AdvanceTiles();
+    void UpdateUpcomingTiles();
     float mySpeed;
 };
 

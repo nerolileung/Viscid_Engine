@@ -1,6 +1,7 @@
 #include "TilePooler.h"
 #include "framework/Game.h"
 #include <cmath>
+#include "framework/include/SDL2/SDL_image.h"
 
 TilePooler::TilePooler(){
 }
@@ -13,8 +14,8 @@ TilePooler::~TilePooler(){
     }
 }
 
-bool TilePooler::Init(SDL_Renderer* aRenderer, int tileSize){
-    int maxTileWidth = (int)std::ceil(Game::WindowWidth/tileSize);
+bool TilePooler::Init(SDL_Renderer* aRenderer, int tileSize, int maxTileWidth){
+    // load tiles
     myPoolSize = tileSize*maxTileWidth;
     myTiles.resize(myPoolSize);
 
@@ -23,7 +24,13 @@ bool TilePooler::Init(SDL_Renderer* aRenderer, int tileSize){
     }
     Tile::SetSize(tileSize);
     
-    //load sprite sheets
+    // load tile sprites
+    SDL_Surface* tempSurface = IMG_Load("data/tile.png");
+    myTileSprites[0] = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
+    // todo load others
+    myTileSprites[1] = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
+    myTileSprites[2] = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
+    SDL_FreeSurface(tempSurface);
     for (int i = 0; i < sizeof(myTileSprites); i++)
         if (myTileSprites[i] == nullptr) return false;
     
