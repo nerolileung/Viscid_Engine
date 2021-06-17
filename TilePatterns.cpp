@@ -8,7 +8,8 @@ std::vector<unsigned char> TilePatterns::GetPattern(PATTERNS key){
 
 void TilePatterns::Init(){
     myPatterns[(int)PATTERNS::LOW_FLOOR] = {COLUMN::TILE7, COLUMN::TILE7, COLUMN::TILE7};
-    myPatterns[(int)PATTERNS::LOW_FLOOR_GAP_2] = {COLUMN::TILE7, 0x00, 0x00, COLUMN::TILE7};
+    myPatterns[(int)PATTERNS::LOW_FLOOR_GAP_1] = {COLUMN::TILE7, 0x00, COLUMN::TILE7};
+    myPatterns[(int)PATTERNS::HIGH_FLOOR] = {COLUMN::TILE2, COLUMN::TILE2, COLUMN::TILE2};
 }
 
 unsigned char TilePatterns::GetRow(int index){

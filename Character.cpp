@@ -87,15 +87,15 @@ void Character::Update(float deltaTime, float speed){
         {
             ChangeState(PLAYER_STATE::JUMPING);
         }
-        else if ((keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
-            && (myState == PLAYER_STATE::JUMPING || myState == PLAYER_STATE::RUNNING))
+        else if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
         {
-            ChangeState(PLAYER_STATE::SLIDING);
+            if (myState != PLAYER_STATE::SLIDING)
+                ChangeState(PLAYER_STATE::SLIDING);
         }
-        else if ((!keystate[SDL_SCANCODE_DOWN] || !keystate[SDL_SCANCODE_S])
-            && myState == PLAYER_STATE::SLIDING)
+        else if (!keystate[SDL_SCANCODE_DOWN] || !keystate[SDL_SCANCODE_S])
         {
-            ChangeState(PLAYER_STATE::RUNNING);
+            if (myState == PLAYER_STATE::SLIDING)
+                ChangeState(PLAYER_STATE::RUNNING);
         }
 
         // movement and related state changes

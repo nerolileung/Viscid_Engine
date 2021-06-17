@@ -8,7 +8,8 @@ class TilePatterns{
 public:
     enum class PATTERNS{
         LOW_FLOOR = 0,
-        LOW_FLOOR_GAP_2
+        LOW_FLOOR_GAP_1,
+        HIGH_FLOOR = 10
     };
     static void Init();
     static std::vector<unsigned char> GetPattern(PATTERNS key);
