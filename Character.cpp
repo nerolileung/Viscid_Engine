@@ -7,6 +7,7 @@
 Character::Character(){
     myCurrentSpriteIndex = 0;
     mySpriteTimerCurrent = 0.f;
+    myJumpTimer = 0.f;
 }
 
 Character::~Character(){
@@ -104,8 +105,10 @@ void Character::Update(float deltaTime, float speed){
 }
 
 void Character::UpdatePosition(float deltaTime, float speed){
-    if (myState == PLAYER_STATE::JUMPING){
-        // steal hatquest logic
+    if (myState == PLAYER_STATE::JUMPING && myJumpTimer > 0){
+        myJumpTimer -= deltaTime;
+        // fake gravity, but in reverse
+        myPosition.y -= std::floorf(deltaTime * gameUnit * 3.f);
     }
     else {
         // fake gravity: a constant force
@@ -123,6 +126,9 @@ void Character::UpdatePosition(float deltaTime, float speed){
                     if (Collisions::Box(myPosition,centeredPosition)){
                         // push player on top of tile
                         myPosition.y = tiles[i]->GetPosition().y - (myPosition.h / 2);
+                        // landed
+                        if (myState == PLAYER_STATE::JUMPING)
+                            ChangeState(PLAYER_STATE::RUNNING);
                     }
                 }
             }
@@ -137,9 +143,9 @@ void Character::Render(SDL_Renderer* aRenderer){
 
 void Character::ChangeState(PLAYER_STATE aState){
     // find top corner (rendering position)
-    SDL_Point originalPosition;
-    originalPosition.x = myPosition.x - (myPosition.w / 2);
-    originalPosition.y = myPosition.y - (myPosition.h / 2);
+    SDL_Rect originalPosition = mySprites[myCurrentSpriteIndex]->GetDimensions();
+    originalPosition.x = myPosition.x - (originalPosition.w / 2);
+    originalPosition.y = myPosition.y - (originalPosition.h / 2);
 
     // update position
     myCurrentSpriteIndex = aState;
@@ -147,12 +153,14 @@ void Character::ChangeState(PLAYER_STATE aState){
     myPosition.x = originalPosition.x + (myPosition.w / 2);
     myPosition.y = originalPosition.y + (myPosition.h / 2);
 
-    // update collision boxes; sprite is unaffected
+    // update other logic
     switch (aState){
         case PLAYER_STATE::RUNNING:
+            // adjust collision box; sprite is unaffected
             myPosition.w *= 0.8f;
         break;
         case PLAYER_STATE::JUMPING:
+            myJumpTimer = 0.5f;
         break;
         case PLAYER_STATE::SLIDING:
         break;

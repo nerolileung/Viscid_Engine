@@ -24,14 +24,19 @@ private:
     };
     PLAYER_STATE myState;
     void ChangeState(PLAYER_STATE aState);
+
     bool InitSprites(SDL_Renderer* aRenderer);
     std::vector<std::unique_ptr<UI_Element>> mySprites;
     int myCurrentSpriteIndex;
     float mySpriteTimerCurrent;
     float mySpriteTimerMax;
+
+    float myJumpTimer;
+
     int gameUnit;
     SDL_Rect myPosition;
     TilePooler* tilePooler;
+
     void UpdatePosition(float deltaTime, float speed);
 };
 
