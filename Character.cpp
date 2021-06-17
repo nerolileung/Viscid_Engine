@@ -1,5 +1,7 @@
 #include "Character.h"
 #include "framework/Game.h"
+#include "framework/Collisions.h"
+#include <cmath>
 
 Character::Character(){
     myCurrentSpriteIndex = 0;
@@ -12,11 +14,9 @@ Character::~Character(){
 
 bool Character::Init(SDL_Renderer* aRenderer, int unitSize, TilePooler* aTilePooler){
     gameUnit = unitSize;
-    // running sprite dimensions
-    myPosition.w = gameUnit;
-    myPosition.h = gameUnit * 5 / 3;
-    myPosition.x = (gameUnit * 2) - (myPosition.w / 2);
-    myPosition.y = (gameUnit * 7) - (myPosition.h / 2);
+    // initial position
+    myPosition.x = gameUnit * 2;
+    myPosition.y = gameUnit * 8;
     
     if (!InitSprites(aRenderer)) return false;
     ChangeState(PLAYER_STATE::RUNNING);
@@ -28,10 +28,37 @@ bool Character::Init(SDL_Renderer* aRenderer, int unitSize, TilePooler* aTilePoo
 }
 
 bool Character::InitSprites(SDL_Renderer* aRenderer){
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
+    // running sprites
+    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition.x, myPosition.y)));
     if (!mySprites[0]) return false;
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
+    // use first sprite to determine scale of others
+    float scale = gameUnit / mySprites[0]->GetDimensions().w;
+    myPosition.w = gameUnit;
+    mySprites[0]->SetSize({myPosition.w, myPosition.h},UI_Element::ASPECT_RATIO::WIDTH);
+
+    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition.x, myPosition.y)));
     if (!mySprites[1]) return false;
+    //myPosition.w = mySprites[1]->GetDimensions().w * scale;
+    mySprites[1]->SetSize({myPosition.w, myPosition.h},UI_Element::ASPECT_RATIO::WIDTH);
+
+    // todo other sprites; may need to adjust positions
+    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
+    if (!mySprites[2]) return false;
+    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
+    if (!mySprites[3]) return false;
+    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
+    if (!mySprites[4]) return false;
+    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
+    if (!mySprites[5]) return false;
+    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
+    if (!mySprites[6]) return false;
+    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
+    if (!mySprites[7]) return false;
+
+    // return to original position
+    myPosition = mySprites[0]->GetDimensions();
+    myPosition.x = (gameUnit * 2) - (myPosition.w / 2);
+    myPosition.y = (gameUnit * 7) - (myPosition.h / 2);
 
     return true;
 }
@@ -48,27 +75,29 @@ void Character::Update(float deltaTime, float speed){
         mySpriteTimerCurrent += mySpriteTimerMax;
     }
 
-    // handle input-related state changes
-    const Uint8* keystate = SDL_GetKeyboardState(NULL);
-    if ((keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W])
-        && myState != PLAYER_STATE::JUMPING)
-    {
-        ChangeState(PLAYER_STATE::JUMPING);
-    }
-    else if ((keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
-        && (myState == PLAYER_STATE::JUMPING || myState == PLAYER_STATE::RUNNING))
-    {
-        ChangeState(PLAYER_STATE::SLIDING);
-    }
-    else if ((!keystate[SDL_SCANCODE_DOWN] || !keystate[SDL_SCANCODE_S])
-        && myState == PLAYER_STATE::SLIDING)
-    {
-        ChangeState(PLAYER_STATE::RUNNING);
-    }
+    if (myState != PLAYER_STATE::DEAD){
+        // handle input-related state changes
+        const Uint8* keystate = SDL_GetKeyboardState(NULL);
+        if ((keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W])
+            && myState != PLAYER_STATE::JUMPING)
+        {
+            ChangeState(PLAYER_STATE::JUMPING);
+        }
+        else if ((keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
+            && (myState == PLAYER_STATE::JUMPING || myState == PLAYER_STATE::RUNNING))
+        {
+            ChangeState(PLAYER_STATE::SLIDING);
+        }
+        else if ((!keystate[SDL_SCANCODE_DOWN] || !keystate[SDL_SCANCODE_S])
+            && myState == PLAYER_STATE::SLIDING)
+        {
+            ChangeState(PLAYER_STATE::RUNNING);
+        }
 
-    // movement and related state changes
-    UpdatePosition(deltaTime, speed);
-    if (isDead()) ChangeState(PLAYER_STATE::DEAD);
+        // movement and related state changes
+        UpdatePosition(deltaTime, speed);
+        if (isDead()) ChangeState(PLAYER_STATE::DEAD);
+    }
 }
 
 void Character::UpdatePosition(float deltaTime, float speed){
@@ -76,38 +105,27 @@ void Character::UpdatePosition(float deltaTime, float speed){
         // steal hatquest logic
     }
     else {
-        // move into empty space below
-        SDL_Point tilePosition = {myPosition.x, myPosition.y + myPosition.h / 2};
-        tilePosition.x += myPosition.w/2;
-        Tile* right = tilePooler->GetTileAt(tilePosition);
-        tilePosition.x -= myPosition.w/2;
-        Tile* middle = tilePooler->GetTileAt(tilePosition);
-        tilePosition.x -= myPosition.w/2;
-        Tile* left = tilePooler->GetTileAt(tilePosition);
-
-        if (!right && !middle && !left){
-            myPosition.y += deltaTime * speed;
-
-            // correct for over-movement
-            tilePosition.x = myPosition.x + myPosition.w/2;
-            right = tilePooler->GetTileAt(tilePosition);
-            tilePosition.x -= myPosition.w/2;
-            middle = tilePooler->GetTileAt(tilePosition);
-            tilePosition.x -= myPosition.w/2;
-            left = tilePooler->GetTileAt(tilePosition);
-
-            if (right || middle || left){
-                if (right != nullptr)
-                    myPosition.y = right->GetPosition().x;
-                else if (middle != nullptr)
-                    myPosition.y = middle->GetPosition().x;
-                else if (left != nullptr)
-                    myPosition.y = left->GetPosition().x;
-                myPosition.y = myPosition.y - myPosition.h / 2;
+        // fake gravity: a constant force
+        myPosition.y += std::ceilf(deltaTime * gameUnit * 2);
+        // correct for over-movement into tiles
+        std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(myPosition);
+        if (!tiles.empty()){
+            for (int i = 0; i < tiles.size(); i++){
+            // only consider tiles below bottom edge of player
+                if (tiles[i]->GetPosition().y > (myPosition.y - (myPosition.h/2))){
+                    // check that we're still colliding with this tile
+                    SDL_Rect centeredPosition = tiles[i]->GetPosition();
+                    centeredPosition.x += (centeredPosition.w / 2);
+                    centeredPosition.y += (centeredPosition.h / 2);
+                    if (Collisions::Box(myPosition,centeredPosition)){
+                        // push player on top of tile
+                        myPosition.y = tiles[i]->GetPosition().y - (myPosition.h / 2);
+                    }
+                }
             }
-            mySprites[myCurrentSpriteIndex]->SetPosition({myPosition.x,myPosition.y});
         }
     }
+    mySprites[myCurrentSpriteIndex]->SetPosition({myPosition.x,myPosition.y});
 }
 
 void Character::Render(SDL_Renderer* aRenderer){
@@ -115,24 +133,21 @@ void Character::Render(SDL_Renderer* aRenderer){
 }
 
 void Character::ChangeState(PLAYER_STATE aState){
+    myCurrentSpriteIndex = aState;
+    myPosition = mySprites[myCurrentSpriteIndex]->GetDimensions();
     switch (aState){
         case PLAYER_STATE::RUNNING:
-            myPosition = mySprites[0]->GetDimensions();
-            myPosition.x = (gameUnit * 2) - (myPosition.w / 2);
-            myPosition.y = (gameUnit * 7) - (myPosition.h / 2); // todo
-            mySprites[0]->SetPosition({myPosition.x,myPosition.y});
-            mySprites[1]->SetPosition({myPosition.x,myPosition.y});
+            // adjust collision box; sprite is unaffected
+            myPosition.w *= 0.8f;
         break;
         case PLAYER_STATE::JUMPING:
         break;
         case PLAYER_STATE::SLIDING:
-            myPosition.h = gameUnit;
         break;
         case PLAYER_STATE::DEAD:
         break;
     }
     myState = aState;
-    myCurrentSpriteIndex = myState;
 }
 
 bool Character::isDead(){
@@ -145,16 +160,11 @@ bool Character::isDead(){
 
     // hit something
     bool hasCollided = false;
-    // check tiles to the right and above
-    for (int i = (myPosition.y - myPosition.h/2);
-        i <= (myPosition.y + myPosition.h/2);
-        i = i + gameUnit)
-    {
-        for (int j = (myPosition.x - myPosition.w/2);
-            i <= (myPosition.x + myPosition.w/2);
-            i = i + gameUnit)
-        {
-            if(tilePooler->GetTileAt({j,i}) != nullptr)
+    std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(myPosition);
+    // ignore collisions with tiles below player (floor)
+    if (!tiles.empty()){
+        for (int i = 0; i < tiles.size(); i++){
+            if (tiles[i]->GetPosition().y < (myPosition.y + (myPosition.h/2)))
                 hasCollided = true;
         }
     }

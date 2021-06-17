@@ -2,6 +2,7 @@
 #include "framework/Game.h"
 #include <cmath>
 #include "framework/include/SDL2/SDL_image.h"
+#include "framework/Collisions.h"
 
 TilePooler::TilePooler(){
 }
@@ -28,10 +29,13 @@ bool TilePooler::Init(SDL_Renderer* aRenderer, int tileSize, int maxTileWidth){
     Tile::SetSize(tileSize);
     
     // load tile sprites
-    SDL_Surface* tempSurface = IMG_Load("data/tile.png");
+    SDL_Surface* tempSurface = IMG_Load("data/tiles_1.png");
     myTileSprites[0] = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
-    // todo load others
+    SDL_FreeSurface(tempSurface);
+    tempSurface = IMG_Load("data/tiles_2.png");
     myTileSprites[1] = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
+    SDL_FreeSurface(tempSurface);
+    tempSurface = IMG_Load("data/tiles_3.png");
     myTileSprites[2] = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
     SDL_FreeSurface(tempSurface);
     for (int i = 0; i < sizeof(myTileSprites); i++)
@@ -64,12 +68,16 @@ bool TilePooler::SetFreeTile(SDL_Point aPosition, SDL_Point aSprite){
     return false;
 }
 
-Tile* TilePooler::GetTileAt(SDL_Point aPosition){
+std::vector<Tile*> TilePooler::GetTilesCollidingWith(SDL_Rect aPosition){
+    std::vector<Tile*> collidingTiles;
     for (int i = 0; i < myTiles.size(); i++){
-        SDL_Rect tileRect = myTiles[i].GetPosition();
-        if (SDL_PointInRect(&aPosition, &tileRect)){
-            return &myTiles[i];
+        if (myTiles[i].isActive()){
+            SDL_Rect centeredPosition = myTiles[i].GetPosition();
+            centeredPosition.x += (centeredPosition.w / 2);
+            centeredPosition.y += (centeredPosition.h / 2);
+            if (Collisions::Box(aPosition, centeredPosition))
+                collidingTiles.push_back(&myTiles[i]);
         }
     }
-    return nullptr;
+    return collidingTiles;
 }

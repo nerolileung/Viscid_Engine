@@ -13,7 +13,7 @@ public:
     void Render(SDL_Renderer* aRenderer);
     bool Init(SDL_Renderer* aRenderer, int tileSize, int maxTileWidth);
     bool SetFreeTile(SDL_Point aPosition, SDL_Point aSprite);
-    Tile* GetTileAt(SDL_Point aPosition);
+    std::vector<Tile*> GetTilesCollidingWith(SDL_Rect aPosition);
 private:
     int myPoolSize;
     std::vector<Tile> myTiles;

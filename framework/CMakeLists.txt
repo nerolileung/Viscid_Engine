@@ -7,4 +7,6 @@ framework/UI_Element.h
 framework/UI_Element.cpp
 framework/UI_Button.h
 framework/UI_Button.cpp
+framework/Collisions.h
+framework/Collisions.cpp
 )

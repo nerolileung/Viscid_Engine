@@ -21,6 +21,7 @@ public:
     virtual void Update(float deltaTime);
     virtual void Render(SDL_Renderer* aRenderer);
     void SetPosition(SDL_Point aPosition);
+    void SetSize(SDL_Point aSize, ASPECT_RATIO ratio);
     SDL_Rect GetDimensions() { return myPosition; };
 protected:
     SDL_Texture* myTexture;

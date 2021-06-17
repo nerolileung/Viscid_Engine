@@ -38,7 +38,8 @@ bool HatQuest::Update(float deltaTime){
             ChangeScene(PLAYING);
             break;
             case PLAYING:
-            ChangeScene(((SceneLevel*)myCurrentScene)->GetNextScene());
+            //ChangeScene(((SceneLevel*)myCurrentScene)->GetNextScene());
+            ChangeScene(MAIN_MENU);
             break;
             case END:
             // todo get data from scene
@@ -63,7 +64,7 @@ void HatQuest::Render(SDL_Renderer* aRenderer){
             return;
         }
     }
-    myCurrentScene->Render(aRenderer);
+    else myCurrentScene->Render(aRenderer);
 }
 
 void HatQuest::ChangeScene(SCENES newSceneType){

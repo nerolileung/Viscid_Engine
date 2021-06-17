@@ -2,16 +2,14 @@
 
 UI_Element::UI_Element(){
     myTexture = nullptr;
-    myPosition.w = 0;
-    myPosition.h = 0;
+    SetSize({0,0},ASPECT_RATIO::NONE);
 }
 
 UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer){
     SDL_Surface* tempSurface = IMG_Load(texturePath);
     myTexture = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
     SDL_FreeSurface(tempSurface);
-    myPosition.w = 0;
-    myPosition.h = 0;
+    SetSize({0,0},ASPECT_RATIO::NONE);
 }
 
 UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, float xPos, float yPos){
@@ -19,9 +17,7 @@ UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, float x
     myTexture = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
     SDL_FreeSurface(tempSurface);
     SDL_QueryTexture(myTexture,NULL,NULL,&myPosition.w,&myPosition.h);
-    // offset so given position is midpoint of element
-    myPosition.x = xPos - (myPosition.w / 2);
-    myPosition.y = yPos - (myPosition.h / 2);
+    SetPosition({(int)xPos,(int)yPos});
 }
 
 UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, SDL_Rect aPosition, ASPECT_RATIO ratio){
@@ -30,23 +26,8 @@ UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, SDL_Rec
     SDL_FreeSurface(tempSurface);
     // scale element based on given ratio and dimensions
     SDL_QueryTexture(myTexture,NULL,NULL,&myPosition.w,&myPosition.h);
-    switch (ratio){
-        case ASPECT_RATIO::NONE:
-            myPosition.w = aPosition.w;
-            myPosition.h = aPosition.h;
-        break;
-        case ASPECT_RATIO::HEIGHT:
-            myPosition.w = myPosition.w * aPosition.h / myPosition.h;
-            myPosition.h = aPosition.h;
-        break;
-        case ASPECT_RATIO::WIDTH:
-            myPosition.h = myPosition.h * aPosition.w / myPosition.w;
-            myPosition.w = aPosition.w;
-        break;
-    }
-    // offset so given position is midpoint of element
-    myPosition.x = aPosition.x - (myPosition.w / 2);
-    myPosition.y = aPosition.y - (myPosition.h / 2);
+    SetSize({aPosition.w, aPosition.h},ratio);
+    SetPosition({aPosition.x,aPosition.y});
 }
 
 UI_Element::~UI_Element(){
@@ -68,6 +49,24 @@ void UI_Element::Render(SDL_Renderer* aRenderer){
 }
 
 void UI_Element::SetPosition(SDL_Point aPosition){
+    // offset so given position is midpoint of element
     myPosition.x = aPosition.x - (myPosition.w / 2);
     myPosition.y = aPosition.y - (myPosition.h / 2);
+}
+
+void UI_Element::SetSize(SDL_Point aSize, ASPECT_RATIO ratio){
+    switch (ratio){
+        case ASPECT_RATIO::NONE:
+            myPosition.w = aSize.x;
+            myPosition.h = aSize.y;
+        break;
+        case ASPECT_RATIO::HEIGHT:
+            myPosition.w = myPosition.w * aSize.y / myPosition.h;
+            myPosition.h = aSize.y;
+        break;
+        case ASPECT_RATIO::WIDTH:
+            myPosition.h = myPosition.h * aSize.x / myPosition.w;
+            myPosition.w = aSize.x;
+        break;
+    }
 }
