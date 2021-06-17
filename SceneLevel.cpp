@@ -22,7 +22,7 @@ SceneLevel::SceneLevel(){
     for (int i = 0; i < 3; i++){
         myUpcomingTiles[i] = TilePatterns::GetRow(7);
     }
-    myUpcomingPattern = TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_FLOOR);
+    myUpcomingPattern.push_back(TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_FLOOR));
 
     myTileAdvanceCounter = myTileSize;
     mySpeed = 1.f;
@@ -135,12 +135,14 @@ void SceneLevel::UpdateUpcomingTiles(){
     myUpcomingTiles[1] = myUpcomingTiles[2];
 
     if (myUpcomingPattern.empty()){
-        int patternIndex = std::rand() % TilePatterns::size();
-        // todo do cool logic combining pieces/doing certain amounts of low/mid/high pieces
-        myUpcomingPattern = TilePatterns::GetPattern((TilePatterns::PATTERNS)patternIndex);
+        int lowPatternIndex = std::rand() % (int)TilePatterns::PATTERNS::HIGH_FLOOR;
+        int highPatternIndex = std::rand() % (int)TilePatterns::PATTERNS::HIGH_FLOOR;
+        if (highPatternIndex > 0) highPatternIndex += 3;
+        myUpcomingPattern.push_back(TilePatterns::GetPattern((TilePatterns::PATTERNS)lowPatternIndex) | TilePatterns::GetPattern((TilePatterns::PATTERNS)highPatternIndex));
     }
 
     myUpcomingTiles[2] = myUpcomingPattern[0];
+
     if (myUpcomingPattern.size() == 1) myUpcomingPattern.pop_back();
     else myUpcomingPattern.erase(myUpcomingPattern.begin(),myUpcomingPattern.begin()+1);
 }
