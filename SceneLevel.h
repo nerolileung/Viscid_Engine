@@ -5,6 +5,7 @@
 #include "HatQuest.h"
 #include "Character.h"
 #include "TilePooler.h"
+#include "framework/UI_Element.h"
 #include <vector>
 #include <array>
 
@@ -18,10 +19,15 @@ public:
     HatQuest::SCENES GetNextScene();
 private:
     bool myPaused;
+    bool myPauseKeyPressed;
+    UI_Element* myPauseOverlay;
+
     Character* myPlayer;
+
     float myBackgroundColour[3];
     int myBackgroundColourChange[3];
     void UpdateBackgroundColour(float deltaTime);
+
     int myTileSize;
     int myTileMaxX;
     TilePooler* myTilePooler;
@@ -30,6 +36,7 @@ private:
     float myTileAdvanceCounter;
     void AdvanceTiles();
     void UpdateUpcomingTiles();
+    
     float mySpeed;
 };
 

@@ -6,6 +6,7 @@ SceneLevel::SceneLevel(){
     // level flags
     myFinished = false;
     myPaused = false;
+    myPauseKeyPressed = false;
 
     // initialise background colour
     myBackgroundColour[0] = 28.f - std::rand()%4;
@@ -52,28 +53,24 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer){
         myTilePooler->SetFreeTile({i*myTileSize, 7*myTileSize},{0,0});
     }
 
+    // pause menu
+    myPauseOverlay = new UI_Element("data/pause_bg.png",aRenderer);
+
     return true;
 }
 
 bool SceneLevel::Update(float deltaTime){
-    // pause game
-    SDL_Event event;
-    SDL_PeepEvents(&event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
-    switch (event.type){
-        case SDL_EventType::SDL_WINDOWEVENT:
-            if (event.window.type == SDL_WINDOWEVENT_MINIMIZED && !myPaused)
-                myPaused = true;
-            else if (event.window.type == SDL_WINDOWEVENT_FOCUS_LOST && !myPaused)
-                myPaused = true;
-        break;
-        case SDL_EventType::SDL_KEYDOWN:
-            if (event.key.keysym.sym == SDLK_TAB)
-                myPaused = !myPaused;
-        break;
-    }
+    // pause game on keydown
+    const Uint8* keystate = SDL_GetKeyboardState(NULL);
+    if (!myPaused && keystate[SDL_SCANCODE_ESCAPE] && !myPauseKeyPressed)
+        myPaused = true;
+    else if (myPaused && keystate[SDL_SCANCODE_ESCAPE] && !myPauseKeyPressed)
+        myPaused = false;
+    myPauseKeyPressed = keystate[SDL_SCANCODE_ESCAPE];
 
     if (myPaused){
         // update pause menu ui and nothing else
+        myPauseOverlay->Update(deltaTime);
         // if return to main menu button is pressed, set finished
         // if quit button is pressed, return false
         // if restart button is pressed, set finished and unpause
@@ -184,7 +181,8 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
     myPlayer->Render(aRenderer);
 
     if (myPaused){
-        // render pause menu ui
+        // render pause menu ui on top
+        myPauseOverlay->Render(aRenderer);
     }
 }
 

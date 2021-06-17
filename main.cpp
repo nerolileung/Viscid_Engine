@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
   // start measuring time
   float lastTime = (float)SDL_GetTicks() * 0.001f;
 
-  // game loop; event is always 1 and polling it updates the keyboard state
+  // game loop; event should always be 1 and polling it updates the keyboard state
   while (SDL_PollEvent(&event) >= 0){
     // restore window after un-minimising
     if (event.window.event == SDL_WINDOWEVENT_MINIMIZED && !windowMinimised)
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     }
 
     lastTime = currentTime;
-    SDL_Delay(1);
+    SDL_Delay(10); // a little more than 60 fps
   }
 
   // cleanup logos
