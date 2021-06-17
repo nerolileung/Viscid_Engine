@@ -2,6 +2,7 @@
 #include "framework/Game.h"
 #include "framework/Collisions.h"
 #include <cmath>
+#include <cstring>
 
 Character::Character(){
     myCurrentSpriteIndex = 0;
@@ -16,7 +17,7 @@ bool Character::Init(SDL_Renderer* aRenderer, int unitSize, TilePooler* aTilePoo
     gameUnit = unitSize;
     // initial position
     myPosition.x = gameUnit * 2;
-    myPosition.y = gameUnit * 8;
+    myPosition.y = gameUnit * 7;
     
     if (!InitSprites(aRenderer)) return false;
     ChangeState(PLAYER_STATE::RUNNING);
@@ -28,37 +29,39 @@ bool Character::Init(SDL_Renderer* aRenderer, int unitSize, TilePooler* aTilePoo
 }
 
 bool Character::InitSprites(SDL_Renderer* aRenderer){
-    // running sprites
     mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition.x, myPosition.y)));
+    // don't try to do math on an object that doesn't exist
     if (!mySprites[0]) return false;
     // use first sprite to determine scale of others
-    float scale = gameUnit / mySprites[0]->GetDimensions().w;
-    myPosition.w = gameUnit;
+    float scale = gameUnit;
+    scale /= mySprites[0]->GetDimensions().w;
+    myPosition.w = scale * mySprites[0]->GetDimensions().w;
     mySprites[0]->SetSize({myPosition.w, myPosition.h},UI_Element::ASPECT_RATIO::WIDTH);
 
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition.x, myPosition.y)));
-    if (!mySprites[1]) return false;
-    //myPosition.w = mySprites[1]->GetDimensions().w * scale;
-    mySprites[1]->SetSize({myPosition.w, myPosition.h},UI_Element::ASPECT_RATIO::WIDTH);
-
-    // todo other sprites; may need to adjust positions
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
-    if (!mySprites[2]) return false;
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
-    if (!mySprites[3]) return false;
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
-    if (!mySprites[4]) return false;
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
-    if (!mySprites[5]) return false;
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_1.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
-    if (!mySprites[6]) return false;
-    mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element("data/player_2.png", aRenderer, myPosition, UI_Element::ASPECT_RATIO::WIDTH)));
-    if (!mySprites[7]) return false;
+    // initialise all other sprites
+    for (int i = 1; i < 8; i++){
+        const char* filename;
+        switch (i){ // todo probably include associated state in filename
+            case 1: filename = "data/player_2.png"; break;
+            case 2: filename = "data/player_3.png"; break;
+            case 3: filename = "data/player_4.png"; break;
+            case 4: filename = "data/player_5.png"; break;
+            case 5: filename = "data/player_6.png"; break;
+            case 6: filename = "data/player_7.png"; break;
+            case 7: filename = "data/player_8.png"; break;
+        } 
+        mySprites.push_back(std::unique_ptr<UI_Element>(new UI_Element(filename, aRenderer, myPosition.x, myPosition.y)));
+        if (!mySprites[i]) return false;
+        myPosition.w = mySprites[i]->GetDimensions().w * scale;
+        mySprites[i]->SetSize({myPosition.w, myPosition.h},UI_Element::ASPECT_RATIO::WIDTH);
+        // todo may need to adjust positions to keep midpoint consistent
+    }
 
     // return to original position
     myPosition = mySprites[0]->GetDimensions();
     myPosition.x = (gameUnit * 2) - (myPosition.w / 2);
     myPosition.y = (gameUnit * 7) - (myPosition.h / 2);
+    mySprites[myCurrentSpriteIndex]->SetPosition({myPosition.x,myPosition.y});
 
     return true;
 }
@@ -106,7 +109,7 @@ void Character::UpdatePosition(float deltaTime, float speed){
     }
     else {
         // fake gravity: a constant force
-        myPosition.y += std::ceilf(deltaTime * gameUnit * 2);
+        myPosition.y += std::ceilf(deltaTime * gameUnit * 1.5f);
         // correct for over-movement into tiles
         std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(myPosition);
         if (!tiles.empty()){
@@ -133,11 +136,20 @@ void Character::Render(SDL_Renderer* aRenderer){
 }
 
 void Character::ChangeState(PLAYER_STATE aState){
+    // find top corner (rendering position)
+    SDL_Point originalPosition;
+    originalPosition.x = myPosition.x - (myPosition.w / 2);
+    originalPosition.y = myPosition.y - (myPosition.h / 2);
+
+    // update position
     myCurrentSpriteIndex = aState;
     myPosition = mySprites[myCurrentSpriteIndex]->GetDimensions();
+    myPosition.x = originalPosition.x + (myPosition.w / 2);
+    myPosition.y = originalPosition.y + (myPosition.h / 2);
+
+    // update collision boxes; sprite is unaffected
     switch (aState){
         case PLAYER_STATE::RUNNING:
-            // adjust collision box; sprite is unaffected
             myPosition.w *= 0.8f;
         break;
         case PLAYER_STATE::JUMPING:
@@ -155,7 +167,7 @@ bool Character::isDead(){
     if (myState == PLAYER_STATE::DEAD) return true;
 
     // fell
-    if (myPosition.y > Game::WindowHeight - (myPosition.h/2))
+    if (myPosition.y + (myPosition.h/2) > Game::WindowHeight)
         return true;
 
     // hit something
