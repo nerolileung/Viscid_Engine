@@ -7,7 +7,6 @@ HatQuest::HatQuest(){
     myCurrentSceneType = MAIN_MENU;
     myCurrentScene = (Scene*)(new SceneMainMenu());
     initialisedScene = false;
-    myPaused = false;
     fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 200));
     fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 50));
     Scene::SetFonts(fonts);
@@ -32,13 +31,6 @@ HatQuest::~HatQuest(){
 }
 
 bool HatQuest::Update(float deltaTime){
-    //pause on escape
-    const Uint8* keystate = SDL_GetKeyboardState(NULL);
-    if (keystate[SDL_SCANCODE_ESCAPE]){
-        myPaused = !myPaused;
-        if (myCurrentSceneType == SCENES::PLAYING)
-            ((SceneLevel*)myCurrentScene)->SetPaused(myPaused);
-    }
     // move to new scene
     if (myCurrentScene->isFinished()){
         switch (myCurrentSceneType){
@@ -102,5 +94,4 @@ void HatQuest::ChangeScene(SCENES newSceneType){
     }
     myCurrentSceneType = newSceneType;
     initialisedScene = false;
-    myPaused = false;
 }

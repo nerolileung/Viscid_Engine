@@ -1,4 +1,5 @@
 #include "Tile.h"
+#include <cmath>
 
 int Tile::tileSize;
 
@@ -26,22 +27,12 @@ void Tile::Init(SDL_Point sourcePos, SDL_Point destPos, SDL_Texture* aSpriteshee
 };
 
 void Tile::Update(float deltaTime, float speed){
-    myPositionRect.x -= deltaTime * speed;
+    myPositionRect.x -= std::ceilf(deltaTime * speed);
     // deactivate when offscreen
-    if (myPositionRect.x + (myPositionRect.w / 2) < 0)
+    if (myPositionRect.x < -myPositionRect.w)
         myActive = false;
 }
 
 void Tile::Render(SDL_Renderer* aRenderer){
     SDL_RenderCopy(aRenderer, mySpritesheet, &mySourceRect, &myPositionRect);
-}
-
-bool Tile::operator == (Tile otherTile){
-    if (mySourceRect.x != otherTile.mySourceRect.x) return false;
-    if (mySourceRect.y != otherTile.mySourceRect.y) return false;
-    if (mySpritesheet != otherTile.mySpritesheet) return false;
-    if (myPositionRect.x != otherTile.myPositionRect.x) return false;
-    if (myPositionRect.y != otherTile.myPositionRect.y) return false;
-    if (myActive != otherTile.myActive) return false;
-    return true;
 }

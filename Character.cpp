@@ -3,8 +3,7 @@
 
 Character::Character(){
     myCurrentSpriteIndex = 0;
-    mySpriteTimerMax = 0.3f;
-    mySpriteTimerCurrent = mySpriteTimerMax;
+    mySpriteTimerCurrent = 0.f;
 }
 
 Character::~Character(){
@@ -37,7 +36,11 @@ bool Character::InitSprites(SDL_Renderer* aRenderer){
     return true;
 }
 
-void Character::Update(float deltaTime){
+void Character::Update(float deltaTime, float speed){
+    // sprite animation
+    mySpriteTimerMax = speed/3;
+    if (mySpriteTimerMax < 0.05f) mySpriteTimerMax = 0.05f;
+
     mySpriteTimerCurrent -= deltaTime;
     if (mySpriteTimerCurrent < 0){
         if (myCurrentSpriteIndex % 2 == 0) myCurrentSpriteIndex++;
@@ -45,14 +48,30 @@ void Character::Update(float deltaTime){
         mySpriteTimerCurrent += mySpriteTimerMax;
     }
 
-    // handle input
+    // handle input-related state changes
+    const Uint8* keystate = SDL_GetKeyboardState(NULL);
+    if ((keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W])
+        && myState != PLAYER_STATE::JUMPING)
+    {
+        ChangeState(PLAYER_STATE::JUMPING);
+    }
+    else if ((keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
+        && (myState == PLAYER_STATE::JUMPING || myState == PLAYER_STATE::RUNNING))
+    {
+        ChangeState(PLAYER_STATE::SLIDING);
+    }
+    else if ((!keystate[SDL_SCANCODE_DOWN] || !keystate[SDL_SCANCODE_S])
+        && myState == PLAYER_STATE::SLIDING)
+    {
+        ChangeState(PLAYER_STATE::RUNNING);
+    }
 
-    UpdatePosition(deltaTime);
-
+    // movement and related state changes
+    UpdatePosition(deltaTime, speed);
     if (isDead()) ChangeState(PLAYER_STATE::DEAD);
 }
 
-void Character::UpdatePosition(float deltaTime){
+void Character::UpdatePosition(float deltaTime, float speed){
     if (myState == PLAYER_STATE::JUMPING){
         // steal hatquest logic
     }
@@ -67,7 +86,7 @@ void Character::UpdatePosition(float deltaTime){
         Tile* left = tilePooler->GetTileAt(tilePosition);
 
         if (!right && !middle && !left){
-            myPosition.y += deltaTime * mySpriteTimerMax;
+            myPosition.y += deltaTime * speed;
 
             // correct for over-movement
             tilePosition.x = myPosition.x + myPosition.w/2;
@@ -135,7 +154,7 @@ bool Character::isDead(){
             i <= (myPosition.x + myPosition.w/2);
             i = i + gameUnit)
         {
-            if(tilePooler->GetTileAt({j,i}))
+            if(tilePooler->GetTileAt({j,i}) != nullptr)
                 hasCollided = true;
         }
     }

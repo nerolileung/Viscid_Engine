@@ -13,7 +13,6 @@ public:
     bool isActive() { return myActive; };
     SDL_Rect GetPosition(){ return myPositionRect; };
     static void SetSize(int aSize) { tileSize = aSize; };
-    bool operator == (Tile otherTile);
 private:
     SDL_Rect mySourceRect;
     SDL_Rect myPositionRect;

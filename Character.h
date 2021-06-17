@@ -12,11 +12,9 @@ public:
     Character();
     ~Character();
     bool Init(SDL_Renderer* aRenderer, int unitSize, TilePooler* aTilePooler);
-    void Update(float deltaTime);
+    void Update(float deltaTime, float speed);
     void Render(SDL_Renderer* aRenderer);
     bool isDead();
-    void SetSpeed(float speed) { mySpriteTimerMax = speed; };
-    int GetFarRight() { return myPosition.x + (myPosition.w / 2); };
 private:
     enum PLAYER_STATE {
         RUNNING = 0,
@@ -30,11 +28,11 @@ private:
     std::vector<std::unique_ptr<UI_Element>> mySprites;
     int myCurrentSpriteIndex;
     float mySpriteTimerCurrent;
-    float mySpriteTimerMax; // used for general speed too
+    float mySpriteTimerMax;
     int gameUnit;
     SDL_Rect myPosition;
     TilePooler* tilePooler;
-    void UpdatePosition(float deltaTime);
+    void UpdatePosition(float deltaTime, float speed);
 };
 
 #endif // CHARACTER_H

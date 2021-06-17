@@ -3,9 +3,11 @@
 #include "TilePatterns.h"
 
 SceneLevel::SceneLevel(){
+    // level flags
     myFinished = false;
     myPaused = false;
 
+    // initialise background colour
     myBackgroundColour[0] = 28.f - std::rand()%4;
     myBackgroundColour[1] = 150.f + std::rand()%20;
     myBackgroundColour[2] = 201.f - std::rand()%50;
@@ -13,13 +15,18 @@ SceneLevel::SceneLevel(){
     myBackgroundColourChange[1] = 10;
     myBackgroundColourChange[2] = -10;
 
+    // initialise map
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
     TilePatterns::Init();
     for (int i = 0; i < 3; i++){
         myUpcomingTiles[i] = TilePatterns::GetRow(7);
     }
-    mySpeed = 0.3f;
+    myUpcomingPattern = TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_FLOOR);
 
+    myTileAdvanceCounter = myTileSize;
+    mySpeed = 1.f;
+
+    // initialise pointers to other objects
     myPlayer = new Character();
     myTilePooler = new TilePooler();
 }
@@ -44,14 +51,26 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer){
     for (int i = 0; i <= myTileMaxX; i++){
         myTilePooler->SetFreeTile({i*myTileSize, 7*myTileSize},{0,0});
     }
-    
-    myTileAdvanceCounter = myTileSize - myPlayer->GetFarRight();
 
     return true;
 }
 
 bool SceneLevel::Update(float deltaTime){
-    // todo peek event and pause if window is minimised
+    // pause game
+    SDL_Event event;
+    SDL_PeepEvents(&event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+    switch (event.type){
+        case SDL_EventType::SDL_WINDOWEVENT:
+            if (event.window.type == SDL_WINDOWEVENT_MINIMIZED && !myPaused)
+                myPaused = true;
+            else if (event.window.type == SDL_WINDOWEVENT_FOCUS_LOST && !myPaused)
+                myPaused = true;
+        break;
+        case SDL_EventType::SDL_KEYDOWN:
+            if (event.key.keysym.sym == SDLK_TAB)
+                myPaused = !myPaused;
+        break;
+    }
 
     if (myPaused){
         // update pause menu ui and nothing else
@@ -63,15 +82,15 @@ bool SceneLevel::Update(float deltaTime){
         UpdateBackgroundColour(deltaTime);
         
         // generate more map and allocate tiles
-        myTileAdvanceCounter -= deltaTime;
+        myTileAdvanceCounter -= std::ceilf(mySpeed * deltaTime);
         if (myTileAdvanceCounter < 0){
             UpdateUpcomingTiles();
             AdvanceTiles();
-            myTileAdvanceCounter += 1.f;
+            myTileAdvanceCounter += myTileSize;
         } 
 
         myTilePooler->Update(deltaTime, mySpeed);
-        myPlayer->Update(deltaTime);
+        myPlayer->Update(deltaTime, mySpeed);
         myFinished = myPlayer->isDead(); // todo start ghost animation
     }
     return true;
@@ -119,14 +138,14 @@ void SceneLevel::UpdateUpcomingTiles(){
     myUpcomingTiles[1] = myUpcomingTiles[2];
 
     if (myUpcomingPattern.empty()){
-        // avoid the empty pattern at 0
-        int patternIndex = 1 + std::rand()%(TilePatterns::size()-1);
+        int patternIndex = std::rand() % TilePatterns::size();
         // todo do cool logic combining pieces/doing certain amounts of low/mid/high pieces
         myUpcomingPattern = TilePatterns::GetPattern((TilePatterns::PATTERNS)patternIndex);
     }
 
     myUpcomingTiles[2] = myUpcomingPattern[0];
-    myUpcomingPattern.erase(myUpcomingPattern.begin(),myUpcomingPattern.begin()+1);
+    if (myUpcomingPattern.size() == 1) myUpcomingPattern.pop_back();
+    else myUpcomingPattern.erase(myUpcomingPattern.begin(),myUpcomingPattern.begin()+1);
 }
 
 void SceneLevel::AdvanceTiles(){
@@ -151,7 +170,7 @@ void SceneLevel::AdvanceTiles(){
 
         // put new tile at far right of the screen
         SDL_Point spritePosition = { myTileSize * (i % 4), myTileSize * ((i - (i % 4)) / 4)};
-        myTilePooler->SetFreeTile({(myTileMaxX+1)*myTileSize, i*myTileSize},spritePosition);
+        myTilePooler->SetFreeTile({(myTileMaxX + 1)*myTileSize, i*myTileSize},spritePosition);
     }
 }
 

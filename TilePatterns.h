@@ -7,8 +7,7 @@
 class TilePatterns{
 public:
     enum class PATTERNS{
-        CLEAR = 0,
-        LOW_FLOOR,
+        LOW_FLOOR = 0,
         LOW_FLOOR_GAP_2
     };
     static void Init();

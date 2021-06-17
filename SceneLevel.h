@@ -15,7 +15,6 @@ public:
     bool Init(SDL_Renderer* aRenderer) override;
     bool Update(float deltaTime) override;
     void Render(SDL_Renderer* aRenderer) override;
-    void SetPaused(bool paused) { myPaused = paused; };
     HatQuest::SCENES GetNextScene();
 private:
     bool myPaused;
