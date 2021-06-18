@@ -26,11 +26,14 @@ bool SceneMainMenu::Init(SDL_Renderer* aRenderer){
     myHeading = SDL_CreateTextureFromSurface(aRenderer, headingSurface);
     SDL_FreeSurface(headingSurface);
     if (myHeading == nullptr) return false;
-
-    myPlayButton = new UI_Button("data/mainmenu_button.png","Play",gameFonts[1],gameFontColours[0],aRenderer,Game::WindowWidth*0.3f, Game::WindowHeight*0.5f);
+    
+    SDL_Rect buttonPosition = {(int)(Game::WindowWidth*0.3f), (int)(Game::WindowHeight*0.5f), Game::WindowHeight*3/8, Game::WindowHeight*3/8};
+    myPlayButton = new UI_Button("data/mainmenu_button.png","   Play   ",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::HEIGHT);
     if (myPlayButton == nullptr) return false;
 
-    myQuitButton = new UI_Button("data/mainmenu_button.png","Quit",gameFonts[1],gameFontColours[0],aRenderer, Game::WindowWidth*0.7f,Game::WindowHeight*0.7f);
+    buttonPosition.x = Game::WindowWidth*0.7f;
+    buttonPosition.y = Game::WindowHeight*0.7f;
+    myQuitButton = new UI_Button("data/mainmenu_button.png","   Quit   ",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::HEIGHT);
     if (myQuitButton == nullptr) return false;
 
     return true;

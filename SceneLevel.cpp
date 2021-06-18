@@ -42,6 +42,23 @@ SceneLevel::~SceneLevel(){
 
     delete myTilePooler;
     myTilePooler = nullptr;
+
+    delete myPauseOverlay;
+    myPauseOverlay = nullptr;
+
+    delete myRestartButton;
+    myRestartButton = nullptr;
+    delete myQuitButton;
+    myQuitButton = nullptr;
+    delete myMainMenuButton;
+    myMainMenuButton = nullptr;
+
+    delete myControlInfo[0];
+    myControlInfo[0] = nullptr;
+    delete myControlInfo[1];
+    myControlInfo[1] = nullptr;
+    delete myControlInfo[2];
+    myControlInfo[2] = nullptr;
 }
 
 bool SceneLevel::Init(SDL_Renderer* aRenderer){
@@ -73,7 +90,11 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer){
     myMainMenuButton = new UI_Button("data/mainmenu_button.png","Main Menu",gameFonts[1],gameFontColours[0],aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE);
     if (myMainMenuButton == nullptr) return false;
     
-    // todo controls tutorial overlay
+    // controls tutorial overlay
+    SDL_Rect tutorialPosition = {(int)(Game::WindowWidth*0.5f),(int)(Game::WindowHeight*0.3f),(int)(Game::WindowHeight*0.5f),(int)(Game::WindowHeight*0.5f)};
+    myControlInfo[0] = new UI_Element("data/tutorial_pause.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
+    myControlInfo[1] = new UI_Element("data/tutorial_jump.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
+    myControlInfo[2] = new UI_Element("data/tutorial_slide.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
 
     return true;
 }
@@ -208,7 +229,7 @@ void SceneLevel::UpdateTutorial(float deltaTime){
     myControlInfoTimer -= deltaTime;
     if (myControlInfoTimer < 0){
         myControlInfoIndex++;
-        myControlInfoTimer = 2.f;
+        myControlInfoTimer = 5.f;
     }
 }
 
@@ -223,7 +244,7 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
 
     // render tutorial
     if (myControlInfoIndex < 3)
-        //myControlInfo[myControlInfoIndex]->Render(aRenderer);
+        myControlInfo[myControlInfoIndex]->Render(aRenderer);
 
     if (myPaused){
         // render pause menu ui on top
