@@ -10,7 +10,7 @@ SceneLevel::SceneLevel(){
 
     // tutorial info
     myControlInfoIndex = 0;
-    myControlInfoTimer = 2.f;
+    myControlInfoTimer = 3.f;
 
     // initialise background colour
     myBackgroundColour[0] = 28.f - std::rand()%4;
@@ -25,11 +25,11 @@ SceneLevel::SceneLevel(){
     TilePatterns::Init();
     for (int i = 0; i < 3; i++){
         myUpcomingTiles[i] = TilePatterns::GetRow(7);
+        myUpcomingPattern.push_back(myUpcomingTiles[i]);
     }
-    myUpcomingPattern = TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_FLOOR_START,1);
 
-    myTileAdvanceCounter = myTileSize;
-    mySpeed = 1.f;
+    myTileAdvanceCounter = 0.f;
+    mySpeed = 0.5f;
 
     // initialise pointers to other objects
     myPlayer = new Character();
@@ -91,7 +91,7 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer){
     if (myMainMenuButton == nullptr) return false;
     
     // controls tutorial overlay
-    SDL_Rect tutorialPosition = {(int)(Game::WindowWidth*0.5f),(int)(Game::WindowHeight*0.3f),(int)(Game::WindowHeight*0.5f),(int)(Game::WindowHeight*0.5f)};
+    SDL_Rect tutorialPosition = {(int)(Game::WindowWidth*0.5f),(int)(Game::WindowHeight*0.4f),(int)(Game::WindowHeight*0.5f),(int)(Game::WindowHeight*0.5f)};
     myControlInfo[0] = new UI_Element("data/tutorial_pause.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
     myControlInfo[1] = new UI_Element("data/tutorial_jump.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
     myControlInfo[2] = new UI_Element("data/tutorial_slide.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
@@ -130,17 +130,22 @@ bool SceneLevel::Update(float deltaTime){
         if (myControlInfoIndex < 3)
             UpdateTutorial(deltaTime);
         
-        // generate more map and allocate tiles
-        myTileAdvanceCounter -= std::ceilf(mySpeed * deltaTime);
+        // generate more map and allocate next tile
+        myTileAdvanceCounter -= std::ceilf(deltaTime * mySpeed * myTileSize);
         if (myTileAdvanceCounter < 0){
             UpdateUpcomingTiles();
             AdvanceTiles();
-            myTileAdvanceCounter += myTileSize;
+            myTileAdvanceCounter = myTileSize;
         } 
 
         myTilePooler->Update(deltaTime, mySpeed);
         myPlayer->Update(deltaTime, mySpeed);
-        myFinished = myPlayer->isDead(); // todo start ghost animation
+
+        myFinished = myPlayer->isDead(); // todo start delay to play ghost animation
+
+        // start speeding up after tutorial
+        if (myControlInfoIndex > 2)
+            mySpeed += (deltaTime * 0.01f);
     }
     return true;
 }
@@ -229,7 +234,8 @@ void SceneLevel::UpdateTutorial(float deltaTime){
     myControlInfoTimer -= deltaTime;
     if (myControlInfoTimer < 0){
         myControlInfoIndex++;
-        myControlInfoTimer = 5.f;
+        myControlInfoTimer = 3.f;
+        if (myControlInfoIndex > 2) mySpeed = 1.f;
     }
 }
 

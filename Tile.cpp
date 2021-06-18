@@ -27,7 +27,7 @@ void Tile::Init(SDL_Point sourcePos, SDL_Point destPos, SDL_Texture* aSpriteshee
 };
 
 void Tile::Update(float deltaTime, float speed){
-    myPositionRect.x -= std::ceilf(deltaTime * speed);
+    myPositionRect.x -= std::ceilf(deltaTime * speed * tileSize);
     // deactivate when offscreen
     if (myPositionRect.x < -myPositionRect.w)
         myActive = false;

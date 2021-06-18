@@ -7,7 +7,7 @@
 Character::Character(){
     myCurrentSpriteIndex = 0;
     mySpriteTimerCurrent = 0.f;
-    myJumpTimer = 0.f;
+    myJumpTimerCurrent = 0.f;
 }
 
 Character::~Character(){
@@ -69,7 +69,7 @@ bool Character::InitSprites(SDL_Renderer* aRenderer){
 
 void Character::Update(float deltaTime, float speed){
     // sprite animation
-    mySpriteTimerMax = speed/3;
+    mySpriteTimerMax = 1 / (3 * speed);
     if (mySpriteTimerMax < 0.05f) mySpriteTimerMax = 0.05f;
 
     mySpriteTimerCurrent -= deltaTime;
@@ -85,7 +85,16 @@ void Character::Update(float deltaTime, float speed){
         if ((keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W])
             && myState != PLAYER_STATE::JUMPING)
         {
-            ChangeState(PLAYER_STATE::JUMPING);
+            std::vector<Tile*> tilesBelow = tilePooler->GetTilesCollidingWith(myPosition);
+            bool tileDirectlyBelow = false;
+            if (!tilesBelow.empty()){
+                for (int i = 0; i < tilesBelow.size(); i++){
+                    int yPos = tilesBelow[i]->GetPosition().y;
+                    if (yPos > myPosition.y && yPos < myPosition.y + gameUnit)
+                        tileDirectlyBelow = true;
+                }
+            }
+            if (tileDirectlyBelow) ChangeState(PLAYER_STATE::JUMPING);
         }
         else if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
         {
@@ -104,14 +113,16 @@ void Character::Update(float deltaTime, float speed){
 }
 
 void Character::UpdatePosition(float deltaTime, float speed){
-    if (myState == PLAYER_STATE::JUMPING && myJumpTimer > 0){
-        myJumpTimer -= deltaTime;
-        // fake gravity, but in reverse
-        myPosition.y -= std::floorf(deltaTime * gameUnit * 3.f);
+    if (myState == PLAYER_STATE::JUMPING && myJumpTimerCurrent > 0){
+        myJumpTimerCurrent -= deltaTime;
+        // go up for some time and stay up for a bit
+        if (myJumpTimerCurrent > 0.8f){
+            myPosition.y -= std::floorf(deltaTime * gameUnit * 5.f);
+        }
     }
     else {
         // fake gravity: a constant force
-        myPosition.y += std::ceilf(deltaTime * gameUnit * 1.5f);
+        myPosition.y += std::ceilf(deltaTime * gameUnit * 6.f);
         // correct for over-movement into tiles
         std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(myPosition);
         if (!tiles.empty()){
@@ -154,11 +165,14 @@ void Character::ChangeState(PLAYER_STATE aState){
 
     // update other logic
     if (aState == PLAYER_STATE::RUNNING){
-        // adjust collision box; sprite is unaffected
+        // allow player to fall down 1-wide holes; sprite is unaffected
         myPosition.w *= 0.8f;
     }
-    else if (aState == PLAYER_STATE::JUMPING)
-        myJumpTimer = 0.5f;
+    else if (aState == PLAYER_STATE::JUMPING){
+        myJumpTimerCurrent = myJumpTimerMax;
+        // keep width of collision box similar to running sprite
+        myPosition.w = mySprites[myCurrentSpriteIndex]->GetDimensions().w;
+    }
     myState = aState;
 }
 
