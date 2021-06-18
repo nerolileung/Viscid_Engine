@@ -129,6 +129,9 @@ void Character::UpdatePosition(float deltaTime, float speed){
             for (int i = 0; i < tiles.size(); i++){
             // only consider tiles below bottom edge of player
                 if (tiles[i]->GetPosition().y > (myPosition.y - (myPosition.h/2))){
+                    // landed
+                    if (myState == PLAYER_STATE::JUMPING)
+                        ChangeState(PLAYER_STATE::RUNNING);
                     // check that we're still colliding with this tile
                     SDL_Rect centeredPosition = tiles[i]->GetPosition();
                     centeredPosition.x += (centeredPosition.w / 2);
@@ -136,9 +139,6 @@ void Character::UpdatePosition(float deltaTime, float speed){
                     if (Collisions::Box(myPosition,centeredPosition)){
                         // push player on top of tile
                         myPosition.y = tiles[i]->GetPosition().y - (myPosition.h / 2);
-                        // landed
-                        if (myState == PLAYER_STATE::JUMPING)
-                            ChangeState(PLAYER_STATE::RUNNING);
                     }
                 }
             }

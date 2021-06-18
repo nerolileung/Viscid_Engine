@@ -24,7 +24,7 @@ SceneLevel::SceneLevel(){
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
     TilePatterns::Init();
     for (int i = 0; i < 3; i++){
-        myUpcomingTiles[i] = TilePatterns::GetRow(7);
+        myUpcomingTiles[i] = TilePatterns::GetRow(6);
         myUpcomingPattern.push_back(myUpcomingTiles[i]);
     }
 
@@ -62,7 +62,9 @@ SceneLevel::~SceneLevel(){
 }
 
 bool SceneLevel::Init(SDL_Renderer* aRenderer){
-    myTileMaxX = (int)std::ceil(Game::WindowWidth/myTileSize);
+    // get some extra precision
+    float maximumNumberOfTilesOnScreen = (float)Game::WindowWidth/(float)myTileSize;
+    myTileMaxX = (int)std::ceilf(maximumNumberOfTilesOnScreen);
 
     myTilePooler->Init(aRenderer, myTileSize, myTileMaxX);
     if (myTilePooler == nullptr) return false;
@@ -70,7 +72,7 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer){
     myPlayer->Init(aRenderer, myTileSize, myTilePooler);
     if (myPlayer == nullptr) return false;
 
-    for (int i = 0; i <= myTileMaxX; i++){
+    for (int i = 0; i < myTileMaxX; i++){
         myTilePooler->SetFreeTile({i*myTileSize, 7*myTileSize},{0,0});
     }
 
@@ -135,7 +137,7 @@ bool SceneLevel::Update(float deltaTime){
         if (myTileAdvanceCounter < 0){
             UpdateUpcomingTiles();
             AdvanceTiles();
-            myTileAdvanceCounter = myTileSize;
+            myTileAdvanceCounter += myTileSize;
         } 
 
         myTilePooler->Update(deltaTime, mySpeed);
@@ -226,7 +228,7 @@ void SceneLevel::AdvanceTiles(){
 
         // put new tile at far right of the screen
         SDL_Point spritePosition = { myTileSize * (i % 4), myTileSize * ((i - (i % 4)) / 4)};
-        myTilePooler->SetFreeTile({(myTileMaxX + 1)*myTileSize, i*myTileSize},spritePosition);
+        myTilePooler->SetFreeTile({myTileMaxX*myTileSize, i*myTileSize},spritePosition);
     }
 }
 
