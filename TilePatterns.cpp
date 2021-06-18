@@ -7,7 +7,6 @@ std::vector<unsigned char> TilePatterns::GetPattern(PATTERNS key){
 }
 
 void TilePatterns::Init(){
-    myPatterns[(int)PATTERNS::TEMP_SLIDE] = {COLUMN::TILE7 | COLUMN::TILE5};
     myPatterns[(int)PATTERNS::GAP] = {0x00};
 
     myPatterns[(int)PATTERNS::LOW_FLOOR] = {COLUMN::TILE7};

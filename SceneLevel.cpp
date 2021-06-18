@@ -8,6 +8,10 @@ SceneLevel::SceneLevel(){
     myPaused = false;
     myPauseKeyPressed = false;
 
+    // tutorial info
+    myControlInfoIndex = 0;
+    myControlInfoTimer = 2.f;
+
     // initialise background colour
     myBackgroundColour[0] = 28.f - std::rand()%4;
     myBackgroundColour[1] = 150.f + std::rand()%20;
@@ -22,7 +26,7 @@ SceneLevel::SceneLevel(){
     for (int i = 0; i < 3; i++){
         myUpcomingTiles[i] = TilePatterns::GetRow(7);
     }
-    myUpcomingPattern =TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_FLOOR);
+    myUpcomingPattern = TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_FLOOR);
 
     myTileAdvanceCounter = myTileSize;
     mySpeed = 1.f;
@@ -55,6 +59,21 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer){
 
     // pause menu
     myPauseOverlay = new UI_Element("data/pause_bg.png",aRenderer);
+    if (myPauseOverlay == nullptr) return false;
+    // todo different buttons?
+    SDL_Rect pauseButtonPosition = {(int)(Game::WindowWidth*0.1f + myTileSize), (int)(Game::WindowHeight*0.5f), myTileSize*2, myTileSize*2};
+    myRestartButton = new UI_Button("data/mainmenu_button.png"," Restart ",gameFonts[1],gameFontColours[0],aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE);
+    if (myRestartButton == nullptr) return false;
+
+    pauseButtonPosition.x = Game::WindowWidth*0.5f;
+    myQuitButton = new UI_Button("data/mainmenu_button.png","  Quit  ",gameFonts[1],gameFontColours[0],aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE);
+    if (myQuitButton == nullptr) return false;
+
+    pauseButtonPosition.x = Game::WindowWidth*0.9f - myTileSize;
+    myMainMenuButton = new UI_Button("data/mainmenu_button.png","Main Menu",gameFonts[1],gameFontColours[0],aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE);
+    if (myMainMenuButton == nullptr) return false;
+    
+    // todo controls tutorial overlay
 
     return true;
 }
@@ -71,12 +90,24 @@ bool SceneLevel::Update(float deltaTime){
     if (myPaused){
         // update pause menu ui and nothing else
         myPauseOverlay->Update(deltaTime);
-        // if return to main menu button is pressed, set finished
-        // if quit button is pressed, return false
-        // if restart button is pressed, set finished and unpause
+        myRestartButton->Update(deltaTime);
+        myQuitButton->Update(deltaTime);
+        myMainMenuButton->Update(deltaTime);
+        if (myMainMenuButton->isClicked())
+            myFinished = true;
+        else if (myQuitButton->isClicked())
+            return false;
+        else if (myRestartButton->isClicked()){
+            myPaused = false;
+            myFinished = true;
+        }
     }
     else {
         UpdateBackgroundColour(deltaTime);
+
+        // display control scheme infographics at the start
+        if (myControlInfoIndex < 3)
+            UpdateTutorial(deltaTime);
         
         // generate more map and allocate tiles
         myTileAdvanceCounter -= std::ceilf(mySpeed * deltaTime);
@@ -135,11 +166,10 @@ void SceneLevel::UpdateUpcomingTiles(){
     myUpcomingTiles[1] = myUpcomingTiles[2];
 
     if (myUpcomingPattern.empty()){
-        /*int lowPatternIndex = std::rand() % (int)TilePatterns::PATTERNS::HIGH_FLOOR;
+        int lowPatternIndex = std::rand() % (int)TilePatterns::PATTERNS::HIGH_FLOOR;
         int highPatternIndex = std::rand() % (int)TilePatterns::PATTERNS::HIGH_FLOOR;
         if (highPatternIndex > 0) highPatternIndex += 3;
-        myUpcomingPattern.push_back(TilePatterns::GetPattern((TilePatterns::PATTERNS)lowPatternIndex) | TilePatterns::GetPattern((TilePatterns::PATTERNS)highPatternIndex));*/
-        myUpcomingPattern = TilePatterns::GetPattern(TilePatterns::PATTERNS::TEMP_SLIDE);
+        myUpcomingPattern.push_back(TilePatterns::GetPattern((TilePatterns::PATTERNS)lowPatternIndex)[0] | TilePatterns::GetPattern((TilePatterns::PATTERNS)highPatternIndex)[0]);
     }
 
     myUpcomingTiles[2] = myUpcomingPattern[0];
@@ -174,6 +204,14 @@ void SceneLevel::AdvanceTiles(){
     }
 }
 
+void SceneLevel::UpdateTutorial(float deltaTime){
+    myControlInfoTimer -= deltaTime;
+    if (myControlInfoTimer < 0){
+        myControlInfoIndex++;
+        myControlInfoTimer = 2.f;
+    }
+}
+
 void SceneLevel::Render(SDL_Renderer* aRenderer){
     // background changes colour
     SDL_SetRenderDrawColor(aRenderer, myBackgroundColour[0], myBackgroundColour[1], myBackgroundColour[2], SDL_ALPHA_OPAQUE);
@@ -183,9 +221,16 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
     myTilePooler->Render(aRenderer);
     myPlayer->Render(aRenderer);
 
+    // render tutorial
+    if (myControlInfoIndex < 3)
+        //myControlInfo[myControlInfoIndex]->Render(aRenderer);
+
     if (myPaused){
         // render pause menu ui on top
         myPauseOverlay->Render(aRenderer);
+        myRestartButton->Render(aRenderer);
+        myQuitButton->Render(aRenderer);
+        myMainMenuButton->Render(aRenderer);
     }
 }
 

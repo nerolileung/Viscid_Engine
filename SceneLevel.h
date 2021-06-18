@@ -5,7 +5,7 @@
 #include "HatQuest.h"
 #include "Character.h"
 #include "TilePooler.h"
-#include "framework/UI_Element.h"
+#include "framework/UI_Button.h"
 #include <vector>
 #include <array>
 
@@ -21,6 +21,14 @@ private:
     bool myPaused;
     bool myPauseKeyPressed;
     UI_Element* myPauseOverlay;
+    UI_Button* myRestartButton;
+    UI_Button* myQuitButton;
+    UI_Button* myMainMenuButton;
+
+    UI_Element* myControlInfo[3];
+    int myControlInfoIndex;
+    float myControlInfoTimer;
+    void UpdateTutorial(float deltaTime);
 
     Character* myPlayer;
 

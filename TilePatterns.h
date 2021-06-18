@@ -7,8 +7,7 @@
 class TilePatterns{
 public:
     enum class PATTERNS{
-        TEMP_SLIDE,
-        GAP,
+        GAP = 0,
         LOW_FLOOR,
         LOW_JUMP,
         LOW_SLIDE,
