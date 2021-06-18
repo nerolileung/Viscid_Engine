@@ -1,20 +1,22 @@
 #include "TilePatterns.h"
 
-std::map<int,unsigned char> TilePatterns::myPatterns;
+std::map<int,std::vector<unsigned char>> TilePatterns::myPatterns;
 
-unsigned char TilePatterns::GetPattern(PATTERNS key){
+std::vector<unsigned char> TilePatterns::GetPattern(PATTERNS key){
     return myPatterns[(int)key];
 }
 
 void TilePatterns::Init(){
-    myPatterns[(int)PATTERNS::GAP] = 0x00;
-    myPatterns[(int)PATTERNS::LOW_FLOOR] = COLUMN::TILE7;
-    myPatterns[(int)PATTERNS::LOW_JUMP] = COLUMN::TILE7 | COLUMN::TILE6;
-    myPatterns[(int)PATTERNS::LOW_SLIDE] = COLUMN::TILE6 | COLUMN::TILE4;
+    myPatterns[(int)PATTERNS::TEMP_SLIDE] = {COLUMN::TILE7 | COLUMN::TILE5};
+    myPatterns[(int)PATTERNS::GAP] = {0x00};
+
+    myPatterns[(int)PATTERNS::LOW_FLOOR] = {COLUMN::TILE7};
+    myPatterns[(int)PATTERNS::LOW_JUMP] = {COLUMN::TILE7 | COLUMN::TILE6};
+    myPatterns[(int)PATTERNS::LOW_SLIDE] = {COLUMN::TILE6 | COLUMN::TILE4};
     
-    myPatterns[(int)PATTERNS::HIGH_FLOOR] = COLUMN::TILE3;
-    myPatterns[(int)PATTERNS::HIGH_JUMP] = COLUMN::TILE3 | COLUMN::TILE2;
-    myPatterns[(int)PATTERNS::HIGH_SLIDE] = COLUMN::TILE0 | COLUMN::TILE2;
+    myPatterns[(int)PATTERNS::HIGH_FLOOR] = {COLUMN::TILE3};
+    myPatterns[(int)PATTERNS::HIGH_JUMP] = {COLUMN::TILE3 | COLUMN::TILE2};
+    myPatterns[(int)PATTERNS::HIGH_SLIDE] = {COLUMN::TILE0 | COLUMN::TILE2};
 }
 
 unsigned char TilePatterns::GetRow(int index){

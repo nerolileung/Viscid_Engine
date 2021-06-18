@@ -97,8 +97,7 @@ void Character::Update(float deltaTime, float speed){
             if (myState == PLAYER_STATE::SLIDING)
                 ChangeState(PLAYER_STATE::RUNNING);
         }
-
-        // movement and related state changes
+        
         UpdatePosition(deltaTime, speed);
         if (isDead()) ChangeState(PLAYER_STATE::DEAD);
     }
@@ -142,31 +141,24 @@ void Character::Render(SDL_Renderer* aRenderer){
 }
 
 void Character::ChangeState(PLAYER_STATE aState){
-    // find top corner (rendering position)
+    // find bottom corner (rendering position)
     SDL_Rect originalPosition = mySprites[myCurrentSpriteIndex]->GetDimensions();
-    originalPosition.x = myPosition.x - (originalPosition.w / 2);
-    originalPosition.y = myPosition.y - (originalPosition.h / 2);
+    originalPosition.x = myPosition.x + (originalPosition.w / 2);
+    originalPosition.y = myPosition.y + (originalPosition.h / 2);
 
     // update position
     myCurrentSpriteIndex = aState;
     myPosition = mySprites[myCurrentSpriteIndex]->GetDimensions();
-    myPosition.x = originalPosition.x + (myPosition.w / 2);
-    myPosition.y = originalPosition.y + (myPosition.h / 2);
+    myPosition.x = originalPosition.x - (myPosition.w / 2);
+    myPosition.y = originalPosition.y - (myPosition.h / 2);
 
     // update other logic
-    switch (aState){
-        case PLAYER_STATE::RUNNING:
-            // adjust collision box; sprite is unaffected
-            myPosition.w *= 0.8f;
-        break;
-        case PLAYER_STATE::JUMPING:
-            myJumpTimer = 0.5f;
-        break;
-        case PLAYER_STATE::SLIDING:
-        break;
-        case PLAYER_STATE::DEAD:
-        break;
+    if (aState == PLAYER_STATE::RUNNING){
+        // adjust collision box; sprite is unaffected
+        myPosition.w *= 0.8f;
     }
+    else if (aState == PLAYER_STATE::JUMPING)
+        myJumpTimer = 0.5f;
     myState = aState;
 }
 

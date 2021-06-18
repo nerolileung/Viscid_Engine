@@ -7,7 +7,8 @@
 class TilePatterns{
 public:
     enum class PATTERNS{
-        GAP = 0,
+        TEMP_SLIDE,
+        GAP,
         LOW_FLOOR,
         LOW_JUMP,
         LOW_SLIDE,
@@ -16,7 +17,7 @@ public:
         HIGH_SLIDE
     };
     static void Init();
-    static unsigned char GetPattern(PATTERNS key);
+    static std::vector<unsigned char> GetPattern(PATTERNS key);
     static int size() { return myPatterns.size(); };
     static unsigned char GetRow(int index);
 private:
@@ -30,7 +31,7 @@ private:
         TILE6 = 1 << 6,
         TILE7 = 1 << 7 // 10000000 or 0x128
     };
-    static std::map<int, unsigned char> myPatterns;
+    static std::map<int, std::vector<unsigned char>> myPatterns;
 };
 
 #endif // TILEPATTERNS_H
