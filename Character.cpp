@@ -139,6 +139,8 @@ void Character::UpdatePosition(float deltaTime, float speed){
         checkPosition.y += (myPosition.h/2) + (gameUnit/2);
         std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(checkPosition);
         if (!tiles.empty()){
+            int highestTileY = Game::WindowHeight;
+            int leftestTileX = Game::WindowWidth;
             for (int i = 0; i < tiles.size(); i++){
                 if (myState == PLAYER_STATE::JUMPING){
                     // tile's y position should be close to bottom edge of player to count as landing
@@ -150,15 +152,20 @@ void Character::UpdatePosition(float deltaTime, float speed){
                     }
                     else continue;
                 }
-                // check that we're still colliding with this tile
-                checkPosition.y = myPosition.y + (myPosition.h/2) + (gameUnit/2);
-                SDL_Rect centeredPosition = tiles[i]->GetPosition();
-                centeredPosition.x += (centeredPosition.w / 2);
-                centeredPosition.y += (centeredPosition.h / 2);
-                
-                if (Collisions::Box(checkPosition,centeredPosition)){
-                    // push player on top of tile
-                    myPosition.y = tiles[i]->GetPosition().y - (myPosition.h/2);
+                // only stand on a tile above the next one
+                if (tiles[i]->GetPosition().y < highestTileY && tiles[i]->GetPosition().x < leftestTileX){
+                    // check that we're still colliding with this tile
+                    checkPosition.y = myPosition.y + (myPosition.h/2) + (gameUnit/2);
+                    SDL_Rect centeredPosition = tiles[i]->GetPosition();
+                    centeredPosition.x += (centeredPosition.w / 2);
+                    centeredPosition.y += (centeredPosition.h / 2);
+                    
+                    if (Collisions::Box(checkPosition,centeredPosition)){
+                        // push player on top of tile
+                        myPosition.y = tiles[i]->GetPosition().y - (myPosition.h/2);
+                    }
+                    highestTileY = tiles[i]->GetPosition().y;
+                    leftestTileX = tiles[i]->GetPosition().x;
                 }
             }
         }
