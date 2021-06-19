@@ -29,6 +29,8 @@ SceneMainMenu.h
 SceneMainMenu.cpp
 SceneLevel.h
 SceneLevel.cpp
+SceneEnd.h
+SceneEnd.cpp
 Character.h
 Character.cpp
 Tile.h

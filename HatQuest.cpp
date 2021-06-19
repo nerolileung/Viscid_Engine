@@ -1,6 +1,7 @@
 #include "HatQuest.h"
 #include "SceneMainMenu.h"
 #include "SceneLevel.h"
+#include "SceneEnd.h"
 #include <iostream>
 
 HatQuest::HatQuest(){
@@ -19,8 +20,8 @@ HatQuest::~HatQuest(){
         case PLAYING:
             delete (SceneLevel*)myCurrentScene;
         break;
-        default:
-            delete myCurrentScene;
+        case END:
+            delete (SceneEnd*)myCurrentScene;
         break;
     }
     myCurrentScene = nullptr;
@@ -38,15 +39,10 @@ bool HatQuest::Update(float deltaTime){
             ChangeScene(PLAYING);
             break;
             case PLAYING:
-            //ChangeScene(((SceneLevel*)myCurrentScene)->GetNextScene());
-            ChangeScene(MAIN_MENU);
+            ChangeScene(((SceneLevel*)myCurrentScene)->GetNextScene());
             break;
             case END:
-            // todo get data from scene
-            ChangeScene(MAIN_MENU);
-            break;
-            default:
-                return false;
+            ChangeScene(((SceneEnd*)myCurrentScene)->GetNextScene());
             break;
         }
     }
@@ -89,8 +85,8 @@ void HatQuest::ChangeScene(SCENES newSceneType){
         case PLAYING:
             myCurrentScene = (Scene*)(new SceneLevel());
         break;
-        default: //todo
-            myCurrentScene = nullptr;
+        case END:
+            myCurrentScene = (Scene*)(new SceneEnd());
         break;
     }
     myCurrentSceneType = newSceneType;
