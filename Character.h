@@ -32,7 +32,9 @@ private:
     float mySpriteTimerMax;
 
     float myJumpTimerCurrent;
-    const float myJumpTimerMax = 1.1f;
+    const float myJumpTimerMax = 2.f;
+    float myJumpForceCurrent;
+    const float myJumpForceMax = 4.f;
 
     int gameUnit;
     SDL_Rect myPosition;

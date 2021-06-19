@@ -8,6 +8,7 @@ Character::Character(){
     myCurrentSpriteIndex = 0;
     mySpriteTimerCurrent = 0.f;
     myJumpTimerCurrent = 0.f;
+    myJumpForceCurrent = 0.f;
 }
 
 Character::~Character(){
@@ -113,33 +114,51 @@ void Character::Update(float deltaTime, float speed){
 }
 
 void Character::UpdatePosition(float deltaTime, float speed){
+    bool falling = true;
     if (myState == PLAYER_STATE::JUMPING && myJumpTimerCurrent > 0){
         myJumpTimerCurrent -= deltaTime;
-        // go up for some time and stay up for a bit
-        if (myJumpTimerCurrent > 0.8f){
-            myPosition.y -= std::floorf(deltaTime * gameUnit * 5.f);
-        }
+
+        // timer controls how long the player spends going up + transition to falling
+        float halfJumpTimerMax = myJumpTimerMax / 2;
+        if (myJumpTimerCurrent > halfJumpTimerMax) falling = false;
+
+        // jump force decreases on way up and increases on way down
+        myJumpForceCurrent = myJumpForceMax * ((myJumpTimerCurrent - halfJumpTimerMax) / halfJumpTimerMax);
+
+        myPosition.y -= std::floorf(deltaTime * gameUnit * myJumpForceCurrent);
     }
     else {
         // fake gravity: a constant force
-        myPosition.y += std::ceilf(deltaTime * gameUnit * 6.f);
+        myPosition.y += std::ceilf(deltaTime * gameUnit * myJumpForceMax);
+    }
+    if (falling){
         // correct for over-movement into tiles
-        std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(myPosition);
+        SDL_Rect checkPosition = myPosition;
+        checkPosition.h = gameUnit;
+        // check tiles below player
+        checkPosition.y += (myPosition.h/2) + (gameUnit/2);
+        std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(checkPosition);
         if (!tiles.empty()){
             for (int i = 0; i < tiles.size(); i++){
-            // only consider tiles below bottom edge of player
-                if (tiles[i]->GetPosition().y > (myPosition.y - (myPosition.h/2))){
-                    // landed
-                    if (myState == PLAYER_STATE::JUMPING)
+                if (myState == PLAYER_STATE::JUMPING){
+                    // tile's y position should be close to bottom edge of player to count as landing
+                    if (tiles[i]->GetPosition().y - (myPosition.y + (myPosition.h/2)) < 1){
                         ChangeState(PLAYER_STATE::RUNNING);
-                    // check that we're still colliding with this tile
-                    SDL_Rect centeredPosition = tiles[i]->GetPosition();
-                    centeredPosition.x += (centeredPosition.w / 2);
-                    centeredPosition.y += (centeredPosition.h / 2);
-                    if (Collisions::Box(myPosition,centeredPosition)){
-                        // push player on top of tile
-                        myPosition.y = tiles[i]->GetPosition().y - (myPosition.h / 2);
+                        // readjust collision box for checking
+                        checkPosition = myPosition;
+                        checkPosition.h = gameUnit;
                     }
+                    else continue;
+                }
+                // check that we're still colliding with this tile
+                checkPosition.y = myPosition.y + (myPosition.h/2) + (gameUnit/2);
+                SDL_Rect centeredPosition = tiles[i]->GetPosition();
+                centeredPosition.x += (centeredPosition.w / 2);
+                centeredPosition.y += (centeredPosition.h / 2);
+                
+                if (Collisions::Box(checkPosition,centeredPosition)){
+                    // push player on top of tile
+                    myPosition.y = tiles[i]->GetPosition().y - (myPosition.h/2);
                 }
             }
         }
@@ -166,10 +185,11 @@ void Character::ChangeState(PLAYER_STATE aState){
     // update other logic
     if (aState == PLAYER_STATE::RUNNING){
         // allow player to fall down 1-wide holes; sprite is unaffected
-        myPosition.w *= 0.8f;
+        myPosition.w *= 0.75f;
     }
     else if (aState == PLAYER_STATE::JUMPING){
         myJumpTimerCurrent = myJumpTimerMax;
+        myJumpForceCurrent = myJumpForceMax;
         // keep width of collision box similar to running sprite
         myPosition.w = mySprites[myCurrentSpriteIndex]->GetDimensions().w;
     }
@@ -190,7 +210,7 @@ bool Character::isDead(){
     // ignore collisions with tiles below player (floor)
     if (!tiles.empty()){
         for (int i = 0; i < tiles.size(); i++){
-            if (tiles[i]->GetPosition().y < (myPosition.y + (myPosition.h/2)))
+            if (tiles[i]->GetPosition().y < myPosition.y)
                 hasCollided = true;
         }
     }
