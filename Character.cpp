@@ -81,6 +81,8 @@ void Character::Update(float deltaTime, float speed){
     }
 
     if (myState != PLAYER_STATE::DEAD){
+        CheckCollisionDeath();
+
         // handle input-related state changes
         const Uint8* keystate = SDL_GetKeyboardState(NULL);
         if ((keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W])
@@ -109,7 +111,7 @@ void Character::Update(float deltaTime, float speed){
         }
         
         UpdatePosition(deltaTime, speed);
-        if (isDead()) ChangeState(PLAYER_STATE::DEAD);
+        CheckFallingDeath();
     }
 }
 
@@ -203,23 +205,20 @@ void Character::ChangeState(PLAYER_STATE aState){
     myState = aState;
 }
 
-bool Character::isDead(){
-    // avoid redoing calculations
-    if (myState == PLAYER_STATE::DEAD) return true;
-
-    // fell
-    if (myPosition.y + (myPosition.h/2) > Game::WindowHeight)
-        return true;
-
+void Character::CheckCollisionDeath(){
     // hit something
-    bool hasCollided = false;
     std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(myPosition);
     // ignore collisions with tiles below player (floor)
     if (!tiles.empty()){
         for (int i = 0; i < tiles.size(); i++){
             if (tiles[i]->GetPosition().y < myPosition.y)
-                hasCollided = true;
+                ChangeState(PLAYER_STATE::DEAD);
         }
     }
-    return hasCollided;
+}
+
+void Character::CheckFallingDeath(){
+    // fell
+    if (myPosition.y + (myPosition.h/2) > Game::WindowHeight)
+        ChangeState(PLAYER_STATE::DEAD);
 }

@@ -14,7 +14,7 @@ public:
     bool Init(SDL_Renderer* aRenderer, int unitSize, TilePooler* aTilePooler);
     void Update(float deltaTime, float speed);
     void Render(SDL_Renderer* aRenderer);
-    bool isDead();
+    bool isDead() { return myState == PLAYER_STATE::DEAD; };
 private:
     enum PLAYER_STATE {
         RUNNING = 0,
@@ -41,6 +41,8 @@ private:
     TilePooler* tilePooler;
 
     void UpdatePosition(float deltaTime, float speed);
+    void CheckCollisionDeath();
+    void CheckFallingDeath();
 };
 
 #endif // CHARACTER_H

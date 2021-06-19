@@ -24,7 +24,7 @@ SceneLevel::SceneLevel(){
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
     TilePatterns::Init();
     for (int i = 0; i < 3; i++){
-        myUpcomingTiles[i] = TilePatterns::GetRow(6);
+        myUpcomingTiles[i] = TilePatterns::GetRow(7);
         myUpcomingPattern.push_back(myUpcomingTiles[i]);
     }
 
