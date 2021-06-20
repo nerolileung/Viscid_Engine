@@ -32,6 +32,12 @@ private:
 
     Character* myPlayer;
 
+    UI_Element* myHat;
+    float myHatTimerCurrent;
+    float myHatTimerMax;
+    int myHatDirection;
+    void UpdateHatPosition(float deltaTime);
+
     float myBackgroundColour[3];
     int myBackgroundColourChange[3];
     void UpdateBackgroundColour(float deltaTime);

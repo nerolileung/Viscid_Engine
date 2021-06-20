@@ -154,7 +154,7 @@ void Character::UpdatePosition(float deltaTime, float speed){
                     else continue;
                 }
                 // only stand on a tile above the next one
-                if (tiles[i]->GetPosition().y < highestTileY && tiles[i]->GetPosition().x < leftestTileX){
+                if (tiles[i]->GetPosition().y < highestTileY && tiles[i]->GetPosition().x <= leftestTileX){
                     // check that we're still colliding with this tile
                     checkPosition.y = myPosition.y + (myPosition.h/2) + (gameUnit/2);
                     SDL_Rect centeredPosition = tiles[i]->GetPosition();

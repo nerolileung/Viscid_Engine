@@ -28,6 +28,7 @@ bool SceneEnd::Init(SDL_Renderer* aRenderer, float duration){
     int minutes = (levelTime - (levelTime % 60)) / 60;
     int remainingSeconds = levelTime % 60;
     std::string timeDisplay = "Final Time: " + std::to_string(minutes) + ":" + std::to_string(remainingSeconds);
+    if (remainingSeconds == 0) timeDisplay+="0";
 
     SDL_Surface* timeSurface = TTF_RenderText_Blended(gameFonts[0],timeDisplay.c_str(),gameFontColours[0]);
     myTime = SDL_CreateTextureFromSurface(aRenderer, timeSurface);

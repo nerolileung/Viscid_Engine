@@ -32,6 +32,10 @@ SceneLevel::SceneLevel(){
     mySpeed = 0.5f;
     myDuration = 0.f;
 
+    myHatTimerMax = 1 / (3 * mySpeed);
+    myHatTimerCurrent = myHatTimerMax;
+    myHatDirection = 1;
+
     // initialise pointers to other objects
     myPlayer = new Character();
     myTilePooler = new TilePooler();
@@ -60,6 +64,9 @@ SceneLevel::~SceneLevel(){
     myControlInfo[1] = nullptr;
     delete myControlInfo[2];
     myControlInfo[2] = nullptr;
+
+    delete myHat;
+    myHat = nullptr;
 }
 
 bool SceneLevel::Init(SDL_Renderer* aRenderer){
@@ -96,8 +103,15 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer){
     // controls tutorial overlay
     SDL_Rect tutorialPosition = {(int)(Game::WindowWidth*0.5f),(int)(Game::WindowHeight*0.4f),(int)(Game::WindowHeight*0.5f),(int)(Game::WindowHeight*0.5f)};
     myControlInfo[0] = new UI_Element("data/tutorial_pause.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
+    if (myControlInfo[0] == nullptr) return false;
     myControlInfo[1] = new UI_Element("data/tutorial_jump.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
+    if (myControlInfo[1] == nullptr) return false;
     myControlInfo[2] = new UI_Element("data/tutorial_slide.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
+    if (myControlInfo[2] == nullptr) return false;
+
+    SDL_Rect hatPosition = {myTileSize*(myTileMaxX-1),(Game::WindowHeight/2),(int)(myTileSize*0.8),(int)(myTileSize*0.8)};
+    myHat = new UI_Element("data/hat.png", aRenderer, hatPosition, UI_Element::ASPECT_RATIO::NONE);
+    if (myHat == nullptr) return false;
 
     return true;
 }
@@ -145,6 +159,8 @@ bool SceneLevel::Update(float deltaTime){
 
         myTilePooler->Update(deltaTime, mySpeed);
         myPlayer->Update(deltaTime, mySpeed);
+
+        UpdateHatPosition(deltaTime);
 
         // start speeding up after tutorial
         if (myControlInfoIndex > 2)
@@ -244,6 +260,23 @@ void SceneLevel::UpdateTutorial(float deltaTime){
     }
 }
 
+void SceneLevel::UpdateHatPosition(float deltaTime){
+    SDL_Point hatPosition;
+    hatPosition.x = myTileSize*(myTileMaxX-1);
+
+    myHatTimerMax = 1 / (3 * mySpeed);
+    if (myHatTimerMax < 0.05f) myHatTimerMax = 0.05f;
+
+    myHatTimerCurrent -= deltaTime;
+    if (myHatTimerCurrent < 0){
+        myHatDirection *= -1;
+        myHatTimerCurrent = myHatTimerMax;
+    }
+
+    hatPosition.y = (Game::WindowHeight/2) + (myTileSize*0.1f*myHatDirection);
+    myHat->SetPosition(hatPosition);
+}
+
 void SceneLevel::Render(SDL_Renderer* aRenderer){
     // background changes colour
     SDL_SetRenderDrawColor(aRenderer, myBackgroundColour[0], myBackgroundColour[1], myBackgroundColour[2], SDL_ALPHA_OPAQUE);
@@ -252,6 +285,7 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
     // render regular screen
     myTilePooler->Render(aRenderer);
     myPlayer->Render(aRenderer);
+    myHat->Render(aRenderer);
 
     // render tutorial
     if (myControlInfoIndex < 3)

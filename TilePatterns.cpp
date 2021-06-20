@@ -47,6 +47,10 @@ void TilePatterns::Init(){
     myPatterns[PATTERNS::LOW_SLIDE_START] = low_floor;
     myPatterns[PATTERNS::LOW_SLIDE_REPEAT] = low_slide;
     myPatterns[PATTERNS::LOW_SLIDE_END] = low_floor;
+
+    myPatterns[PATTERNS::MID_FLOOR_START] = low_mid_bridge;
+    myPatterns[PATTERNS::MID_FLOOR_REPEAT] = mid_floor;
+    myPatterns[PATTERNS::MID_FLOOR_END] = low_mid_bridge;
 }
 
 unsigned char TilePatterns::GetRow(int index){
