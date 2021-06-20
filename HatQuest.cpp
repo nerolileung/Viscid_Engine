@@ -60,6 +60,7 @@ bool HatQuest::Update(float deltaTime){
             break;
             case PLAYING:
                 ChangeScene(((SceneLevel*)myCurrentScene)->GetNextScene(levelTime));
+                if (levelTime > 10) myTutorialDone = true;
             break;
             case END:
                 ChangeScene(((SceneEnd*)myCurrentScene)->GetNextScene());
@@ -80,7 +81,6 @@ void HatQuest::Render(SDL_Renderer* aRenderer){
             break;
             case SCENES::PLAYING:
                 initialisedScene = ((SceneLevel*)myCurrentScene)->Init(aRenderer,!myTutorialDone);
-                if (!myTutorialDone) myTutorialDone = initialisedScene;
             break;
             default:
                 initialisedScene = myCurrentScene->Init(aRenderer);
