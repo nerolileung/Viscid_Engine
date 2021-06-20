@@ -23,10 +23,8 @@ SceneLevel::SceneLevel(){
     // initialise map
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
     TilePatterns::Init();
-    for (int i = 0; i < 3; i++){
+    for (int i = 0; i < 3; i++)
         myUpcomingTiles[i] = TilePatterns::GetRow(7);
-        myUpcomingPattern.push_back(myUpcomingTiles[i]);
-    }
 
     myTileAdvanceCounter = 0.f;
     mySpeed = 0.5f;
@@ -58,18 +56,20 @@ SceneLevel::~SceneLevel(){
     delete myMainMenuButton;
     myMainMenuButton = nullptr;
 
-    delete myControlInfo[0];
-    myControlInfo[0] = nullptr;
-    delete myControlInfo[1];
-    myControlInfo[1] = nullptr;
-    delete myControlInfo[2];
-    myControlInfo[2] = nullptr;
+    if (myControlInfoIndex > 0){
+        delete myControlInfo[0];
+        myControlInfo[0] = nullptr;
+        delete myControlInfo[1];
+        myControlInfo[1] = nullptr;
+        delete myControlInfo[2];
+        myControlInfo[2] = nullptr;
+    }
 
     delete myHat;
     myHat = nullptr;
 }
 
-bool SceneLevel::Init(SDL_Renderer* aRenderer){
+bool SceneLevel::Init(SDL_Renderer* aRenderer, bool playTutorial){
     // get some extra precision
     float maximumNumberOfTilesOnScreen = (float)Game::WindowWidth/(float)myTileSize;
     myTileMaxX = (int)std::ceilf(maximumNumberOfTilesOnScreen);
@@ -100,14 +100,20 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer){
     myMainMenuButton = new UI_Button("data/mainmenu_button.png","Main Menu",gameFonts[1],gameFontColours[0],aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE);
     if (myMainMenuButton == nullptr) return false;
     
-    // controls tutorial overlay
-    SDL_Rect tutorialPosition = {(int)(Game::WindowWidth*0.5f),(int)(Game::WindowHeight*0.4f),(int)(Game::WindowHeight*0.5f),(int)(Game::WindowHeight*0.5f)};
-    myControlInfo[0] = new UI_Element("data/tutorial_pause.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
-    if (myControlInfo[0] == nullptr) return false;
-    myControlInfo[1] = new UI_Element("data/tutorial_jump.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
-    if (myControlInfo[1] == nullptr) return false;
-    myControlInfo[2] = new UI_Element("data/tutorial_slide.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
-    if (myControlInfo[2] == nullptr) return false;
+    if (playTutorial){
+        // controls tutorial overlay
+        SDL_Rect tutorialPosition = {(int)(Game::WindowWidth*0.5f),(int)(Game::WindowHeight*0.4f),(int)(Game::WindowHeight*0.5f),(int)(Game::WindowHeight*0.5f)};
+        myControlInfo[0] = new UI_Element("data/tutorial_pause.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
+        if (myControlInfo[0] == nullptr) return false;
+        myControlInfo[1] = new UI_Element("data/tutorial_jump.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
+        if (myControlInfo[1] == nullptr) return false;
+        myControlInfo[2] = new UI_Element("data/tutorial_slide.png",aRenderer,tutorialPosition,UI_Element::ASPECT_RATIO::WIDTH);
+        if (myControlInfo[2] == nullptr) return false;
+    }
+    else {
+        myControlInfoIndex = -1;
+        mySpeed = 1.f;
+    }
 
     SDL_Rect hatPosition = {myTileSize*(myTileMaxX-1),(Game::WindowHeight/2),(int)(myTileSize*0.8),(int)(myTileSize*0.8)};
     myHat = new UI_Element("data/hat.png", aRenderer, hatPosition, UI_Element::ASPECT_RATIO::NONE);
@@ -146,7 +152,7 @@ bool SceneLevel::Update(float deltaTime){
         UpdateBackgroundColour(deltaTime);
 
         // display control scheme infographics at the start
-        if (myControlInfoIndex < 3)
+        if (myControlInfoIndex < 3 && myControlInfoIndex != -1)
             UpdateTutorial(deltaTime);
         
         // generate more map and allocate next tile
@@ -163,7 +169,7 @@ bool SceneLevel::Update(float deltaTime){
         UpdateHatPosition(deltaTime);
 
         // start speeding up after tutorial
-        if (myControlInfoIndex > 2)
+        if (myControlInfoIndex > 2 || myControlInfoIndex < 0)
             mySpeed += (deltaTime * 0.01f);
             
         myFinished = myPlayer->isDead(); // todo start delay to play ghost animation
@@ -209,20 +215,35 @@ void SceneLevel::UpdateBackgroundColour(float deltaTime){
 }
 
 void SceneLevel::UpdateUpcomingTiles(){
+    // shift tile records
     myUpcomingTiles[0] = myUpcomingTiles[1];
     myUpcomingTiles[1] = myUpcomingTiles[2];
 
     if (myUpcomingPattern.empty()){
+        // get a new pattern
         int tileRepeatCount = std::floorf(mySpeed);
         int patternIndex = std::rand() % TilePatterns::size();
         patternIndex = patternIndex - (patternIndex % 3);
         myUpcomingPattern = TilePatterns::GetPattern((TilePatterns::PATTERNS)patternIndex, tileRepeatCount);
     }
 
-    myUpcomingTiles[2] = myUpcomingPattern[0];
-
-    if (myUpcomingPattern.size() == 1) myUpcomingPattern.pop_back();
-    else myUpcomingPattern.erase(myUpcomingPattern.begin(),myUpcomingPattern.begin()+1);
+    // add buffer between sliding and jumping to a higher level
+    if (
+        myUpcomingTiles[0] == TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_SLIDE_REPEAT) &&
+        myUpcomingTiles[1] == TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_SLIDE_END) &&
+        myUpcomingPattern[0] == TilePatterns::GetPattern(TilePatterns::PATTERNS::MID_FLOOR_START)
+        /*|| (myUpcomingTiles[0] == TilePatterns::GetPattern(TilePatterns::PATTERNS::MID_SLIDE_REPEAT) &&
+        myUpcomingTiles[1] == TilePatterns::GetPattern(TilePatterns::PATTERNS::MID_SLIDE_END) &&
+        myUpcomingPattern[0] == TilePatterns::GetPattern(TilePatterns::PATTERNS::HIGH_FLOOR_LOW_FLOOR_START))*/
+    )
+    {
+        myUpcomingTiles[2] = myUpcomingTiles[1];
+    }
+    else {
+        myUpcomingTiles[2] = myUpcomingPattern[0];
+        if (myUpcomingPattern.size() == 1) myUpcomingPattern.pop_back();
+        else myUpcomingPattern.erase(myUpcomingPattern.begin(),myUpcomingPattern.begin()+1);
+    }
 }
 
 void SceneLevel::AdvanceTiles(){
@@ -288,7 +309,7 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
     myHat->Render(aRenderer);
 
     // render tutorial
-    if (myControlInfoIndex < 3)
+    if (myControlInfoIndex < 3 && myControlInfoIndex != -1)
         myControlInfo[myControlInfoIndex]->Render(aRenderer);
 
     if (myPaused){

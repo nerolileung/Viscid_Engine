@@ -47,6 +47,7 @@ public:
     };
     static void Init();
     static std::vector<unsigned char> GetPattern(PATTERNS key, int size);
+    static unsigned char GetPattern(PATTERNS key);
     static int size() { return myPatterns.size(); };
     static unsigned char GetRow(int index);
 private:

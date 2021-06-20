@@ -25,6 +25,7 @@ private:
     float levelTime;
     void ChangeScene(SCENES newSceneType);
     std::vector<TTF_Font*> fonts;
+    bool myTutorialDone;
 };
 
 #endif // HATQUEST_H

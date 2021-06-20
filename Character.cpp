@@ -109,8 +109,8 @@ void Character::Update(float deltaTime, float speed){
                 ChangeState(PLAYER_STATE::RUNNING);
         }
         
-        UpdatePosition(deltaTime, speed);
         CheckFallingDeath();
+        UpdatePosition(deltaTime, speed);
     }
 }
 
@@ -141,7 +141,6 @@ void Character::UpdatePosition(float deltaTime, float speed){
         std::vector<Tile*> tiles = tilePooler->GetTilesCollidingWith(checkPosition);
         if (!tiles.empty()){
             int highestTileY = Game::WindowHeight;
-            int leftestTileX = Game::WindowWidth;
             for (int i = 0; i < tiles.size(); i++){
                 if (myState == PLAYER_STATE::JUMPING){
                     // tile's y position should be close to bottom edge of player to count as landing
@@ -154,7 +153,7 @@ void Character::UpdatePosition(float deltaTime, float speed){
                     else continue;
                 }
                 // only stand on a tile above the next one
-                if (tiles[i]->GetPosition().y < highestTileY && tiles[i]->GetPosition().x <= leftestTileX){
+                if (tiles[i]->GetPosition().y < highestTileY){
                     // check that we're still colliding with this tile
                     checkPosition.y = myPosition.y + (myPosition.h/2) + (gameUnit/2);
                     SDL_Rect centeredPosition = tiles[i]->GetPosition();
@@ -166,7 +165,6 @@ void Character::UpdatePosition(float deltaTime, float speed){
                         myPosition.y = tiles[i]->GetPosition().y - (myPosition.h/2);
                     }
                     highestTileY = tiles[i]->GetPosition().y;
-                    leftestTileX = tiles[i]->GetPosition().x;
                 }
             }
         }

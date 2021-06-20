@@ -13,7 +13,8 @@ class SceneLevel : public Scene {
 public:
     SceneLevel();
     ~SceneLevel();
-    bool Init(SDL_Renderer* aRenderer) override;
+    bool Init(SDL_Renderer* aRenderer) override { return false; };
+    bool Init(SDL_Renderer* aRenderer, bool playTutorial);
     bool Update(float deltaTime) override;
     void Render(SDL_Renderer* aRenderer) override;
     HatQuest::SCENES GetNextScene(float& duration);

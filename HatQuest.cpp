@@ -9,6 +9,7 @@ HatQuest::HatQuest(){
     myCurrentScene = (Scene*)(new SceneMainMenu());
     initialisedScene = false;
     levelTime = 0.f;
+    myTutorialDone = false;
     fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 200));
     fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 50));
     Scene::SetFonts(fonts);
@@ -55,9 +56,18 @@ bool HatQuest::Update(float deltaTime){
 
 void HatQuest::Render(SDL_Renderer* aRenderer){
     if (!initialisedScene){
-        if (myCurrentSceneType == SCENES::END)
-            initialisedScene = ((SceneEnd*)myCurrentScene)->Init(aRenderer,levelTime);
-        else initialisedScene = myCurrentScene->Init(aRenderer);
+        switch (myCurrentSceneType){
+            case SCENES::END:
+                initialisedScene = ((SceneEnd*)myCurrentScene)->Init(aRenderer,levelTime);
+            break;
+            case SCENES::PLAYING:
+                initialisedScene = ((SceneLevel*)myCurrentScene)->Init(aRenderer,!myTutorialDone);
+                if (!myTutorialDone) myTutorialDone = initialisedScene;
+            break;
+            default:
+                initialisedScene = myCurrentScene->Init(aRenderer);
+            break;
+        }
         if (!initialisedScene) {
             std::cout << "Error initialising scene!";
             return;
@@ -76,8 +86,8 @@ void HatQuest::ChangeScene(SCENES newSceneType){
             case PLAYING:
                 delete (SceneLevel*)myCurrentScene;
             break;
-            default:
-                delete myCurrentScene;
+            case END:
+                delete (SceneEnd*)myCurrentScene;
             break;
         }
     }

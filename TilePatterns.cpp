@@ -1,16 +1,32 @@
 #include "TilePatterns.h"
+#include <cmath>
 
 std::map<TilePatterns::PATTERNS, unsigned char> TilePatterns::myPatterns;
 
+unsigned char TilePatterns::GetPattern(PATTERNS key){
+    return myPatterns[key];
+}
+
 std::vector<unsigned char> TilePatterns::GetPattern(PATTERNS key, int size){
+    if (size < 1) size = 1;
+    int sizeHalf = std::ceilf(size / 2);
+    if (sizeHalf < 1) sizeHalf = 1;
     std::vector<unsigned char> pattern;
-    pattern.push_back(myPatterns[key]);
+
+    for (int i = 0; i < sizeHalf; i++){
+        pattern.push_back(myPatterns[key]);
+    }
+
     PATTERNS nextKey = (PATTERNS)(1+(int)key);
     for (int i = 0; i < size; i++){
         pattern.push_back(myPatterns[nextKey]);
     }
+    
     nextKey = (PATTERNS)(2+(int)key);
-    pattern.push_back(myPatterns[nextKey]);
+    for (int i = 0; i < sizeHalf; i++){
+        pattern.push_back(myPatterns[nextKey]);
+    }
+
     return pattern;
 }
 
