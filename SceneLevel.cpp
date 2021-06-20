@@ -30,6 +30,7 @@ SceneLevel::SceneLevel(){
 
     myTileAdvanceCounter = 0.f;
     mySpeed = 0.5f;
+    myDuration = 0.f;
 
     // initialise pointers to other objects
     myPlayer = new Character();
@@ -126,6 +127,8 @@ bool SceneLevel::Update(float deltaTime){
         }
     }
     else {
+        myDuration += deltaTime;
+
         UpdateBackgroundColour(deltaTime);
 
         // display control scheme infographics at the start
@@ -143,11 +146,11 @@ bool SceneLevel::Update(float deltaTime){
         myTilePooler->Update(deltaTime, mySpeed);
         myPlayer->Update(deltaTime, mySpeed);
 
-        myFinished = myPlayer->isDead(); // todo start delay to play ghost animation
-
         // start speeding up after tutorial
         if (myControlInfoIndex > 2)
             mySpeed += (deltaTime * 0.01f);
+            
+        myFinished = myPlayer->isDead(); // todo start delay to play ghost animation
     }
     return true;
 }
@@ -263,7 +266,9 @@ void SceneLevel::Render(SDL_Renderer* aRenderer){
     }
 }
 
-HatQuest::SCENES SceneLevel::GetNextScene(){
+HatQuest::SCENES SceneLevel::GetNextScene(float& duration){
+    duration = myDuration;
+
     if (myPaused) return HatQuest::SCENES::MAIN_MENU;
     if (myPlayer->isDead()) return HatQuest::SCENES::END;
     else return HatQuest::SCENES::PLAYING;

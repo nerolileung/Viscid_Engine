@@ -9,7 +9,8 @@ class SceneEnd : public Scene {
 public:
     SceneEnd();
     ~SceneEnd();
-    bool Init(SDL_Renderer* aRenderer) override;
+    bool Init(SDL_Renderer* aRenderer) override { return false; };
+    bool Init(SDL_Renderer* aRenderer, float duration);
     bool Update(float deltaTime) override;
     void Render(SDL_Renderer* aRenderer) override;
     HatQuest::SCENES GetNextScene() { return myNextScene; };
@@ -18,7 +19,9 @@ private:
     UI_Button* myRestartButton;
     UI_Button* myQuitButton;
     UI_Button* myMainMenuButton;
+    SDL_Texture* myTime;
     HatQuest::SCENES myNextScene;
+    int levelTime;
 };
 
 #endif // SCENEEND_H

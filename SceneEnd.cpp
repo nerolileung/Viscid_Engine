@@ -1,4 +1,6 @@
 #include "SceneEnd.h"
+#include <cmath>
+#include <string>
 
 SceneEnd::SceneEnd(){
     myFinished = false;
@@ -16,9 +18,22 @@ SceneEnd::~SceneEnd(){
     
     delete myQuitButton;
     myQuitButton = nullptr;
+
+    SDL_DestroyTexture(myTime);
+    myTime = nullptr;
 }
 
-bool SceneEnd::Init(SDL_Renderer* aRenderer){
+bool SceneEnd::Init(SDL_Renderer* aRenderer, float duration){
+    levelTime = std::round(duration); // milliseconds to seconds
+    int minutes = (levelTime - (levelTime % 60)) / 60;
+    int remainingSeconds = levelTime % 60;
+    std::string timeDisplay = "Final Time: " + std::to_string(minutes) + ":" + std::to_string(remainingSeconds);
+
+    SDL_Surface* timeSurface = TTF_RenderText_Blended(gameFonts[0],timeDisplay.c_str(),gameFontColours[0]);
+    myTime = SDL_CreateTextureFromSurface(aRenderer, timeSurface);
+    SDL_FreeSurface(timeSurface);
+    if (myTime == nullptr) return false;
+
     myBackground = new UI_Element("data/end_bg.png",aRenderer);
     if (myBackground == nullptr) return false;
 
@@ -62,4 +77,12 @@ void SceneEnd::Render(SDL_Renderer* aRenderer){
     myRestartButton->Render(aRenderer);
     myQuitButton->Render(aRenderer);
     myMainMenuButton->Render(aRenderer);
+
+    SDL_Rect timePos;
+    SDL_QueryTexture(myTime,NULL,NULL,&timePos.w,&timePos.h);
+    timePos.w *= Game::WindowHeight*0.1f / timePos.h;
+    timePos.h = Game::WindowHeight*0.1f;
+    timePos.y = Game::WindowHeight*0.5f - (timePos.h / 2);
+    timePos.x = Game::WindowWidth*0.5f - (timePos.w / 2);
+    SDL_RenderCopy(aRenderer,myTime,NULL,&timePos);
 }

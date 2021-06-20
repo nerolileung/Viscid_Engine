@@ -56,13 +56,12 @@ bool Character::InitSprites(SDL_Renderer* aRenderer){
         if (!mySprites[i]) return false;
         myPosition.w = mySprites[i]->GetDimensions().w * scale;
         mySprites[i]->SetSize({myPosition.w, myPosition.h},UI_Element::ASPECT_RATIO::WIDTH);
-        // todo may need to adjust positions to keep midpoint consistent
     }
 
     // return to original position
     myPosition = mySprites[0]->GetDimensions();
     myPosition.x = (gameUnit * 2) - (myPosition.w / 2);
-    myPosition.y = (gameUnit * 7) - (myPosition.h / 2);
+    myPosition.y = (gameUnit * 7) - myPosition.h;
     mySprites[myCurrentSpriteIndex]->SetPosition({myPosition.x,myPosition.y});
 
     return true;

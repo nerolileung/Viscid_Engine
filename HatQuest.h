@@ -22,6 +22,7 @@ private:
     SCENES myCurrentSceneType;
     Scene* myCurrentScene;
     bool initialisedScene;
+    float levelTime;
     void ChangeScene(SCENES newSceneType);
     std::vector<TTF_Font*> fonts;
 };

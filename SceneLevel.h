@@ -16,7 +16,7 @@ public:
     bool Init(SDL_Renderer* aRenderer) override;
     bool Update(float deltaTime) override;
     void Render(SDL_Renderer* aRenderer) override;
-    HatQuest::SCENES GetNextScene();
+    HatQuest::SCENES GetNextScene(float& duration);
 private:
     bool myPaused;
     bool myPauseKeyPressed;
@@ -46,6 +46,7 @@ private:
     void UpdateUpcomingTiles();
     
     float mySpeed;
+    float myDuration;
 };
 
 #endif // SCENELEVEL_H
