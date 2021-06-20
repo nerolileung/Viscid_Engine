@@ -61,7 +61,7 @@ bool Character::InitSprites(SDL_Renderer* aRenderer){
     // return to original position
     myPosition = mySprites[0]->GetDimensions();
     myPosition.x = (gameUnit * 2) - (myPosition.w / 2);
-    myPosition.y = (gameUnit * 7) - myPosition.h;
+    myPosition.y = (gameUnit * 7) - (myPosition.h / 2);
     mySprites[myCurrentSpriteIndex]->SetPosition({myPosition.x,myPosition.y});
 
     return true;
@@ -130,7 +130,9 @@ void Character::UpdatePosition(float deltaTime, float speed){
     }
     else {
         // fake gravity: a constant force
-        myPosition.y += std::ceilf(deltaTime * gameUnit * myJumpForceMax);
+        if (deltaTime < 0.01f)
+            myPosition.y += std::ceilf(deltaTime * gameUnit * myJumpForceMax);
+        else myPosition.y += std::ceilf(0.009f * gameUnit * myJumpForceMax);
     }
     if (falling){
         // correct for over-movement into tiles
