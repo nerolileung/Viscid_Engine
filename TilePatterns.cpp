@@ -13,6 +13,26 @@ std::vector<unsigned char> TilePatterns::GetPattern(PATTERNS key, int size){
     if (sizeHalf < 1) sizeHalf = 1;
     std::vector<unsigned char> pattern;
 
+    bool upperLevelObstacle = false;
+    unsigned char upperLevelFloor = 0x00;
+
+    if (key >= PATTERNS::MID_JUMP_BLOCK_START
+        /* && key < PATTERNS::HIGH_FLOOR_LOW_FLOOR*/
+    ){
+        upperLevelObstacle = true;
+        upperLevelFloor = myPatterns[PATTERNS::MID_FLOOR_START];
+    }
+    /*else if (key >= PATTERNS::HIGH_JUMP_BLOCK_LOW_FLOOR){
+        upperLevelObstacle = true;
+        upperLevelFloor = myPatterns[PATTERNS::HIGH_FLOOR_LOW_FLOOR_START];
+    }*/
+
+    if (upperLevelObstacle) {
+        for (int i = 0; i < sizeHalf; i++){
+            pattern.push_back(upperLevelFloor);
+        }
+    }
+
     for (int i = 0; i < sizeHalf; i++){
         pattern.push_back(myPatterns[key]);
     }
@@ -25,6 +45,12 @@ std::vector<unsigned char> TilePatterns::GetPattern(PATTERNS key, int size){
     nextKey = (PATTERNS)(2+(int)key);
     for (int i = 0; i < sizeHalf; i++){
         pattern.push_back(myPatterns[nextKey]);
+    }
+
+    if (upperLevelObstacle) {
+        for (int i = 0; i < sizeHalf; i++){
+            pattern.push_back(upperLevelFloor);
+        }
     }
 
     return pattern;
@@ -67,6 +93,18 @@ void TilePatterns::Init(){
     myPatterns[PATTERNS::MID_FLOOR_START] = low_mid_bridge;
     myPatterns[PATTERNS::MID_FLOOR_REPEAT] = mid_floor;
     myPatterns[PATTERNS::MID_FLOOR_END] = low_mid_bridge;
+
+    myPatterns[PATTERNS::MID_JUMP_BLOCK_START] = mid_floor;
+    myPatterns[PATTERNS::MID_JUMP_BLOCK_REPEAT] = mid_jump;
+    myPatterns[PATTERNS::MID_JUMP_BLOCK_END] = mid_floor;
+
+    myPatterns[PATTERNS::MID_JUMP_GAP_START] = mid_floor;
+    myPatterns[PATTERNS::MID_JUMP_GAP_REPEAT] = gap;
+    myPatterns[PATTERNS::MID_JUMP_GAP_END] = mid_floor;
+
+    myPatterns[PATTERNS::MID_SLIDE_START] = mid_floor;
+    myPatterns[PATTERNS::MID_SLIDE_REPEAT] = mid_slide;
+    myPatterns[PATTERNS::MID_SLIDE_END] = mid_floor;
 }
 
 unsigned char TilePatterns::GetRow(int index){

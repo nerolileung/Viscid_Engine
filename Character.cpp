@@ -161,8 +161,9 @@ void Character::UpdatePosition(float deltaTime, float speed){
                     centeredPosition.y += (centeredPosition.h / 2);
                     
                     if (Collisions::Box(checkPosition,centeredPosition)){
-                        // push player on top of tile
-                        myPosition.y = tiles[i]->GetPosition().y - (myPosition.h/2);
+                        // push player on top of tile; avoid snapping to it
+                        if (tiles[i]->GetPosition().y - (myPosition.y + (myPosition.h/2)) < 1)
+                            myPosition.y = tiles[i]->GetPosition().y - (myPosition.h/2);
                     }
                     highestTileY = tiles[i]->GetPosition().y;
                 }

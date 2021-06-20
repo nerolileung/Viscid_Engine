@@ -3,6 +3,7 @@
 
 #include "framework/Game.h"
 #include "framework/include/SDL2/SDL_ttf.h"
+#include "framework/include/SDL2/SDL_mixer.h"
 #include "Scene.h"
 #include <vector>
 
@@ -21,11 +22,14 @@ public:
 private:
     SCENES myCurrentSceneType;
     Scene* myCurrentScene;
-    bool initialisedScene;
-    float levelTime;
     void ChangeScene(SCENES newSceneType);
+    bool initialisedScene;
+
     std::vector<TTF_Font*> fonts;
+    float levelTime;
     bool myTutorialDone;
+
+    Mix_Music* mainMenuBGM;
 };
 
 #endif // HATQUEST_H
