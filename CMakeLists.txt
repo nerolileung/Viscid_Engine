@@ -21,24 +21,8 @@ add_subdirectory(framework)
 
 # game files
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-HatQuest.h
-HatQuest.cpp
-Scene.h
-Scene.cpp
-SceneMainMenu.h
-SceneMainMenu.cpp
-SceneLevel.h
-SceneLevel.cpp
-SceneEnd.h
-SceneEnd.cpp
-Character.h
-Character.cpp
-Tile.h
-Tile.cpp
-TilePooler.h
-TilePooler.cpp
-TilePatterns.h
-TilePatterns.cpp
+Demo.h
+Demo.cpp
 )
 
 # specify the C++ standard
@@ -102,3 +86,5 @@ PUBLIC "${PROJECT_SOURCE_DIR}"
 PUBLIC "${PROJECT_SOURCE_DIR}/framework/"
 PUBLIC "${PROJECT_SOURCE_DIR}/include/"
 PUBLIC "${PROJECT_BINARY_DIR}")
+
+install(TARGETS ${CMAKE_PROJECT_NAME} DESTINATION bin)

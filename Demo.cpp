@@ -17,7 +17,7 @@ bool Demo::Update(float deltaTime){
 void Demo::Render(SDL_Renderer* aRenderer){
     // load image if it hasn't loaded yet
     if (!myLogo){
-        SDL_Surface* tempSurface = SDL_LoadBMP("data/icon.bmp");
+        SDL_Surface* tempSurface = SDL_LoadBMP("data/logo.bmp");
         myLogo = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
         SDL_FreeSurface(tempSurface);
     }

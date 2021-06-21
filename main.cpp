@@ -3,11 +3,11 @@
 #include "framework/include/SDL2/SDL_image.h"
 #include "framework/include/SDL2/SDL_mixer.h"
 #include "framework/include/SDL2/SDL_ttf.h"
+#include "Demo.h"
 #include <iostream>
 #include <vector>
 #include "framework/Game.h"
 #include "framework/Logo.h"
-#include "HatQuest.h"
 
 int main(int argc, char *argv[])
 {
@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
     return -4;
   }
 
-  // create instance of specific game here
-  HatQuest* game = new HatQuest();
+  // create game instance
+  Demo* demo = new Demo();
 
   // logos to be displayed
   std::vector<Logo*> logos;
@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
   }
 
   // cleanup game
-  delete game;
-  game = nullptr;
+  delete demo;
+  demo = nullptr;
 
   // cleanup sdl
   SDL_DestroyWindow(window);
