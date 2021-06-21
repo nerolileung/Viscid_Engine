@@ -4,8 +4,9 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/",
-                "${workspaceFolder}/framework/include",
+                "${workspaceFolder}/framework/",
                 "${workspaceFolder}/build-osx",
+                "${workspaceFolder}/build-osx/framework",
                 "/Library/Frameworks/"
             ],
             "defines": [],
