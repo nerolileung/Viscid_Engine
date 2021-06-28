@@ -24,7 +24,7 @@ SceneLevel::SceneLevel(){
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
     TilePatterns::Init();
     for (int i = 0; i < 3; i++)
-        myUpcomingTiles[i] = TilePatterns::GetRow(7);
+        myUpcomingTiles[i] = TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_FLOOR_REPEAT);
 
     myTileAdvanceCounter = 0.f;
     mySpeed = 0.5f;
@@ -81,7 +81,7 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer, bool playTutorial){
     if (myPlayer == nullptr) return false;
 
     for (int i = 0; i < myTileMaxX; i++){
-        myTilePooler->SetFreeTile({i*myTileSize, 7*myTileSize},{0,0});
+        myTilePooler->SetFreeTile({i*myTileSize, 7*myTileSize},{0,900});
     }
 
     // pause menu
@@ -249,12 +249,12 @@ void SceneLevel::UpdateUpcomingTiles(){
 void SceneLevel::AdvanceTiles(){
     for (int i = 0; i < 8; i++){
         // is there a tile here?
-        int FlagToCheck = TilePatterns::GetRow(i);
+        int FlagToCheck = (1 << i);
         if ((myUpcomingTiles[1] & FlagToCheck) == 0) continue;
 
         // determine sprite based on adjacent tiles
-        int UpperFlagToCheck = TilePatterns::GetRow(i-1);
-        int LowerFlagToCheck = TilePatterns::GetRow(i+1);
+        int UpperFlagToCheck = (1 << (i-1));
+        int LowerFlagToCheck = (1 << (i+1));
 
         int index = 0;
         if ((myUpcomingTiles[0] & FlagToCheck) == 0) // left empty
@@ -267,7 +267,7 @@ void SceneLevel::AdvanceTiles(){
             index += 8;
 
         // put new tile at far right of the screen
-        SDL_Point spritePosition = { myTileSize * (i % 4), myTileSize * ((i - (i % 4)) / 4)};
+        SDL_Point spritePosition = { 300 * (index % 4), 300 * ((index - (index % 4)) / 4)};
         myTilePooler->SetFreeTile({myTileMaxX*myTileSize, i*myTileSize},spritePosition);
     }
 }

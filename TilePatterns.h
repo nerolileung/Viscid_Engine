@@ -55,7 +55,6 @@ public:
     static std::vector<unsigned char> GetPattern(PATTERNS key, int size);
     static unsigned char GetPattern(PATTERNS key);
     static int size() { return myPatterns.size(); };
-    static unsigned char GetRow(int index);
 private:
     enum COLUMN {
         TILE0 = 1 << 0, // 00000001 or 0x01

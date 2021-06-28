@@ -106,17 +106,3 @@ void TilePatterns::Init(){
     myPatterns[PATTERNS::MID_SLIDE_REPEAT] = mid_slide;
     myPatterns[PATTERNS::MID_SLIDE_END] = mid_floor;
 }
-
-unsigned char TilePatterns::GetRow(int index){
-    switch (index){
-        case 0: return COLUMN::TILE0; break;
-        case 1: return COLUMN::TILE1; break;
-        case 2: return COLUMN::TILE2; break;
-        case 3: return COLUMN::TILE3; break;
-        case 4: return COLUMN::TILE4; break;
-        case 5: return COLUMN::TILE5; break;
-        case 6: return COLUMN::TILE6; break;
-        case 7: return COLUMN::TILE7; break;
-        default: return COLUMN::TILE0; break;
-    }
-}
