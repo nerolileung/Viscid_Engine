@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
   Game::WindowWidth = dimensions.w;
   bool windowMinimised = false;
 
-  // create renderer using first rendering driver with hardware acceleration
-  SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  // create renderer using first rendering driver with hardware acceleration & vsync
+  SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (!window){
     std::cout << "Failed to create window! Error:" << SDL_GetError();
     return -2;
