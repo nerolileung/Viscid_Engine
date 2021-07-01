@@ -26,7 +26,7 @@ SceneLevel::SceneLevel(){
     for (int i = 0; i < 3; i++)
         myUpcomingTiles[i] = TilePatterns::GetPattern(TilePatterns::PATTERNS::LOW_FLOOR_REPEAT);
 
-    myTileAdvanceCounter = 0.f;
+    myTileAdvanceCounter = 0;
     mySpeed = 0.5f;
     myDuration = 0.f;
 
@@ -156,12 +156,13 @@ bool SceneLevel::Update(float deltaTime){
             UpdateTutorial(deltaTime);
         
         // generate more map and allocate next tile
-        myTileAdvanceCounter -= std::ceilf(deltaTime * mySpeed * myTileSize);
+        float distance = std::ceilf(deltaTime * mySpeed * myTileSize);
+        myTileAdvanceCounter -= distance;
         if (myTileAdvanceCounter < 0){
-            UpdateUpcomingTiles();
-            AdvanceTiles();
             myTileAdvanceCounter += myTileSize;
-        } 
+            UpdateUpcomingTiles();
+            AdvanceTiles(distance - (myTileSize - myTileAdvanceCounter));
+        }
 
         myTilePooler->Update(deltaTime, mySpeed);
         myPlayer->Update(deltaTime, mySpeed);
@@ -246,7 +247,7 @@ void SceneLevel::UpdateUpcomingTiles(){
     }
 }
 
-void SceneLevel::AdvanceTiles(){
+void SceneLevel::AdvanceTiles(int offset){
     for (int i = 0; i < 8; i++){
         // is there a tile here?
         int FlagToCheck = (1 << i);
@@ -266,9 +267,10 @@ void SceneLevel::AdvanceTiles(){
         if (i == 7 || ((myUpcomingTiles[1] & LowerFlagToCheck) == 0)) // down
             index += 8;
 
-        // put new tile at far right of the screen
         SDL_Point spritePosition = { 300 * (index % 4), 300 * ((index - (index % 4)) / 4)};
-        myTilePooler->SetFreeTile({myTileMaxX*myTileSize, i*myTileSize},spritePosition);
+        // put new tile at far right of the screen
+        int tileX = (myTileMaxX * myTileSize) + offset;
+        myTilePooler->SetFreeTile({tileX, i*myTileSize},spritePosition);
     }
 }
 

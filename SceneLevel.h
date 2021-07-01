@@ -48,8 +48,8 @@ private:
     TilePooler* myTilePooler;
     std::array<unsigned char,3> myUpcomingTiles;
     std::vector<unsigned char> myUpcomingPattern;
-    float myTileAdvanceCounter;
-    void AdvanceTiles();
+    int myTileAdvanceCounter;
+    void AdvanceTiles(int offset);
     void UpdateUpcomingTiles();
     
     float mySpeed;
