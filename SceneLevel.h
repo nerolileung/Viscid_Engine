@@ -37,6 +37,7 @@ private:
     float myHatTimerCurrent;
     float myHatTimerMax;
     int myHatDirection;
+    int myHatTargetY;
     void UpdateHatPosition(float deltaTime);
 
     float myBackgroundColour[3];

@@ -62,7 +62,7 @@ bool Character::InitSprites(SDL_Renderer* aRenderer){
     myPosition = mySprites[0]->GetDimensions();
     myPosition.x = (gameUnit * 2) - (myPosition.w / 2);
     myPosition.y = (gameUnit * 7) - (myPosition.h / 2);
-    mySprites[myCurrentSpriteIndex]->SetPosition({myPosition.x,myPosition.y});
+    mySprites[myCurrentSpriteIndex]->SetPositionCentre({myPosition.x,myPosition.y});
 
     return true;
 }
@@ -172,7 +172,7 @@ void Character::UpdatePosition(float deltaTime, float speed){
             }
         }
     }
-    mySprites[myCurrentSpriteIndex]->SetPosition({myPosition.x,myPosition.y});
+    mySprites[myCurrentSpriteIndex]->SetPositionCentre({myPosition.x,myPosition.y});
 }
 
 void Character::Render(SDL_Renderer* aRenderer){
@@ -185,7 +185,7 @@ void Character::ChangeState(PLAYER_STATE aState){
     originalPosition.x = myPosition.x + (originalPosition.w / 2);
     originalPosition.y = myPosition.y + (originalPosition.h / 2);
 
-    // update position
+    // update position to new midpoint
     myCurrentSpriteIndex = aState;
     myPosition = mySprites[myCurrentSpriteIndex]->GetDimensions();
     myPosition.x = originalPosition.x - (myPosition.w / 2);

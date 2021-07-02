@@ -31,7 +31,7 @@ SceneLevel::SceneLevel(){
     myDuration = 0.f;
 
     myHatTimerMax = 1 / (3 * mySpeed);
-    myHatTimerCurrent = myHatTimerMax;
+    myHatTimerCurrent = -1.f;
     myHatDirection = 1;
 
     // initialise pointers to other objects
@@ -115,9 +115,10 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer, bool playTutorial){
         mySpeed = 1.f;
     }
 
-    SDL_Rect hatPosition = {Game::WindowWidth - myTileSize,(Game::WindowHeight/2),(int)(myTileSize*0.8),(int)(myTileSize*0.8)};
+    SDL_Rect hatPosition = {Game::WindowWidth - myTileSize, myTileSize,(int)(myTileSize*0.8),(int)(myTileSize*0.8)};
     myHat = new UI_Element("data/hat.png", aRenderer, hatPosition, UI_Element::ASPECT_RATIO::NONE);
     if (myHat == nullptr) return false;
+    myHatTargetY = myTileSize * 7;
 
     return true;
 }
@@ -284,19 +285,40 @@ void SceneLevel::UpdateTutorial(float deltaTime){
 }
 
 void SceneLevel::UpdateHatPosition(float deltaTime){
-    SDL_Point hatPosition;
-    hatPosition.x = Game::WindowWidth - myTileSize;
+    // find the highest tile in the same column as the hat
+    SDL_Rect hatColumn = myHat->GetDimensions();
+    hatColumn.h = Game::WindowHeight;
+    hatColumn.y = hatColumn.h/2;
+    hatColumn.x += hatColumn.w * 1.5f;
+    
+    std::vector<Tile*> tiles = myTilePooler->GetTilesCollidingWith(hatColumn);
+    // keep original target if column is empty
+    if (!tiles.empty()){
+        int highestY = myTileSize * 8;
+        for (int i = 0; i < tiles.size(); i++){
+            if (tiles[i]->GetPosition().y < highestY){
+                highestY = tiles[i]->GetPosition().y;
+            }
+        }
+        myHatTargetY = highestY - myTileSize;
+    }
 
-    myHatTimerMax = 1 / (3 * mySpeed);
-    if (myHatTimerMax < 0.05f) myHatTimerMax = 0.05f;
+    // move to target or bob around it if already there
+    SDL_Point hatPosition = {myHat->GetDimensions().x, myHat->GetDimensions().y};
 
-    myHatTimerCurrent -= deltaTime;
-    if (myHatTimerCurrent < 0){
+    if (hatPosition.y == myHatTargetY){
+        myHatTimerMax = 1 / (3 * mySpeed);
+        if (myHatTimerMax < 0.05f) myHatTimerMax = 0.05f;
+
         myHatDirection *= -1;
         myHatTimerCurrent = myHatTimerMax;
     }
+    else if (myHatTimerCurrent < 0) {
+        myHatTargetY > hatPosition.y ? myHatDirection = 1 : myHatDirection = -1;
+    }
+    else myHatTimerCurrent -= deltaTime;
 
-    hatPosition.y = (Game::WindowHeight/2) + (myTileSize*0.1f*myHatDirection);
+    hatPosition.y += std::ceilf(myTileSize * 0.5f * deltaTime) * myHatDirection;
     myHat->SetPosition(hatPosition);
 }
 

@@ -17,7 +17,7 @@ UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, float x
     myTexture = SDL_CreateTextureFromSurface(aRenderer,tempSurface);
     SDL_FreeSurface(tempSurface);
     SDL_QueryTexture(myTexture,NULL,NULL,&myPosition.w,&myPosition.h);
-    SetPosition({(int)xPos,(int)yPos});
+    SetPositionCentre({(int)xPos,(int)yPos});
 }
 
 UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, SDL_Rect aPosition, ASPECT_RATIO ratio){
@@ -27,7 +27,7 @@ UI_Element::UI_Element(const char* texturePath, SDL_Renderer* aRenderer, SDL_Rec
     // scale element based on given ratio and dimensions
     SDL_QueryTexture(myTexture,NULL,NULL,&myPosition.w,&myPosition.h);
     SetSize({aPosition.w, aPosition.h},ratio);
-    SetPosition({aPosition.x,aPosition.y});
+    SetPositionCentre({aPosition.x,aPosition.y});
 }
 
 UI_Element::~UI_Element(){
@@ -49,6 +49,11 @@ void UI_Element::Render(SDL_Renderer* aRenderer){
 }
 
 void UI_Element::SetPosition(SDL_Point aPosition){
+    myPosition.x = aPosition.x;
+    myPosition.y = aPosition.y;
+}
+
+void UI_Element::SetPositionCentre(SDL_Point aPosition){
     // offset so given position is midpoint of element
     myPosition.x = aPosition.x - (myPosition.w / 2);
     myPosition.y = aPosition.y - (myPosition.h / 2);
