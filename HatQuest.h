@@ -4,8 +4,9 @@
 #include "framework/Game.h"
 #include "framework/include/SDL2/SDL_ttf.h"
 #include "framework/include/SDL2/SDL_mixer.h"
-#include "Scene.h"
 #include <vector>
+
+class Scene;
 
 class HatQuest final : public Game
 {

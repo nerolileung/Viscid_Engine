@@ -56,14 +56,12 @@ bool HatQuest::Update(float deltaTime){
     if (myCurrentScene->isFinished()){
         switch (myCurrentSceneType){
             case MAIN_MENU:
-                ChangeScene(PLAYING);
+            case END:
+                ChangeScene(myCurrentScene->GetNextScene());
             break;
             case PLAYING:
                 ChangeScene(((SceneLevel*)myCurrentScene)->GetNextScene(levelTime));
                 if (levelTime > 10) myTutorialDone = true;
-            break;
-            case END:
-                ChangeScene(((SceneEnd*)myCurrentScene)->GetNextScene());
             break;
         }
     }

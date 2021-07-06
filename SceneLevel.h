@@ -2,7 +2,6 @@
 #define SCENELEVEL_H
 
 #include "Scene.h"
-#include "HatQuest.h"
 #include "Character.h"
 #include "TilePooler.h"
 #include "framework/UI_Button.h"

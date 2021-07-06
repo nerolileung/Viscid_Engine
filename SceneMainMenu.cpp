@@ -5,6 +5,7 @@
 
 SceneMainMenu::SceneMainMenu(){
     myFinished = false;
+    myNextScene = HatQuest::SCENES::PLAYING;
 }
 
 SceneMainMenu::~SceneMainMenu(){
