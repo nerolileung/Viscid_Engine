@@ -16,7 +16,7 @@ HatQuest::HatQuest(){
     fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 50));
     Scene::SetFonts(fonts);
 
-    mainMenuBGM = Mix_LoadMUS("data/mainmenu_bgm.wav");
+    menuBGM = Mix_LoadMUS("data/mainmenu_bgm.wav");
     levelBGM = Mix_LoadMUS("data/level_bgm.wav");
 }
 HatQuest::~HatQuest(){
@@ -30,6 +30,9 @@ HatQuest::~HatQuest(){
         case END:
             delete (SceneEnd*)myCurrentScene;
         break;
+        case SETTINGS_MENU:
+            //delete (SceneSettings*)myCurrentScene;
+        break;
     }
     myCurrentScene = nullptr;
 
@@ -39,8 +42,8 @@ HatQuest::~HatQuest(){
     }
 
     Mix_FadeOutMusic(10);
-    Mix_FreeMusic(mainMenuBGM);
-    mainMenuBGM = nullptr;
+    Mix_FreeMusic(menuBGM);
+    menuBGM = nullptr;
     Mix_FreeMusic(levelBGM);
     levelBGM = nullptr;
 }
@@ -49,13 +52,14 @@ bool HatQuest::Update(float deltaTime){
     // start playing bgm on first update after logos get displayed
     if (myCurrentSceneType == SCENES::MAIN_MENU && 
     (Mix_PlayingMusic() == 0 && Mix_FadingMusic() != MIX_FADING_IN)){
-        Mix_FadeInMusic(mainMenuBGM, -1, 100);
+        Mix_FadeInMusic(menuBGM, -1, 100);
     }
 
     // move to new scene
     if (myCurrentScene->isFinished()){
         switch (myCurrentSceneType){
             case MAIN_MENU:
+            //case SETTINGS:
             case END:
                 ChangeScene(myCurrentScene->GetNextScene());
             break;
@@ -93,13 +97,16 @@ void HatQuest::Render(SDL_Renderer* aRenderer){
 }
 
 void HatQuest::ChangeScene(SCENES newSceneType){
-    Mix_HaltMusic();
     // allow changing to current scene for reloading
+    // clean up old scene
     if (myCurrentScene != nullptr){
         switch (myCurrentSceneType){
             case MAIN_MENU:
                 delete (SceneMainMenu*)myCurrentScene;
             break;
+            /*case SETTINGS:
+                delete (SceneSettings*)myCurrentScene;
+            break;*/
             case PLAYING:
                 delete (SceneLevel*)myCurrentScene;
             break;
@@ -108,17 +115,24 @@ void HatQuest::ChangeScene(SCENES newSceneType){
             break;
         }
     }
+    // menu to level music
+    if ((myCurrentSceneType == MAIN_MENU || myCurrentSceneType == SETTINGS_MENU || myCurrentSceneType == END) && newSceneType == PLAYING)
+        Mix_FadeInMusic(levelBGM, -1, 100);
+    // restart level music
+    else if (myCurrentSceneType == PLAYING && newSceneType == PLAYING)
+        Mix_FadeInMusic(levelBGM, -1, 100);
+    // level to menu music
+    else if (myCurrentSceneType == PLAYING && newSceneType != PLAYING)
+        Mix_FadeInMusic(menuBGM, -1, 100);
+    // set up new scene
     switch (newSceneType){
         case MAIN_MENU:
-            Mix_FadeInMusic(mainMenuBGM, -1, 100);
             myCurrentScene = (Scene*)(new SceneMainMenu());
         break;
         case PLAYING:
-            Mix_FadeInMusic(levelBGM, -1, 100);
             myCurrentScene = (Scene*)(new SceneLevel());
         break;
         case END:
-            Mix_FadeInMusic(mainMenuBGM, -1, 100);
             myCurrentScene = (Scene*)(new SceneEnd());
         break;
     }

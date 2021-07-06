@@ -17,6 +17,7 @@ public:
     void Render(SDL_Renderer* aRenderer);
     enum SCENES {
         MAIN_MENU = 0,
+        SETTINGS_MENU,
         PLAYING,
         END
     };
@@ -30,7 +31,7 @@ private:
     float levelTime;
     bool myTutorialDone;
 
-    Mix_Music* mainMenuBGM;
+    Mix_Music* menuBGM;
     Mix_Music* levelBGM;
 };
 
