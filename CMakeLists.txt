@@ -32,7 +32,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_COMPILER clang++)
 
 # sdl
-set(SDL2_EXTRA_LINK_FLAGS_STATIC "-lm -liconv  -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-weak_framework,CoreHaptics -Wl,-weak_framework,GameController -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,CoreVideo -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-weak_framework,QuartzCore -Wl,-weak_framework,Metal")
+set(SDL2_MAC_API_LINK_FLAGS "-lm -liconv  -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-weak_framework,CoreHaptics -Wl,-weak_framework,GameController -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,CoreVideo -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-weak_framework,QuartzCore -Wl,-weak_framework,Metal")
 
 add_library(SDL2::SDL2 STATIC IMPORTED)
 set_target_properties(SDL2::SDL2 PROPERTIES
@@ -41,7 +41,7 @@ set_target_properties(SDL2::SDL2 PROPERTIES
   IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 if (APPLE)
-  set_property(TARGET SDL2::SDL2 PROPERTY INTERFACE_LINK_LIBRARIES "${SDL2_EXTRA_LINK_FLAGS_STATIC}")
+  set_property(TARGET SDL2::SDL2 PROPERTY INTERFACE_LINK_LIBRARIES "${SDL2_MAC_API_LINK_FLAGS}")
 endif()
 
 add_library(SDL2::SDL2main STATIC IMPORTED)
@@ -76,10 +76,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2main)
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2image)
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2mixer)
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2ttf)
-
-if (WIN32)
-	file(COPY "${PROJECT_SOURCE_DIR}/framework/lib/dll/" DESTINATION "${PROJECT_BINARY_DIR}/Debug")
-endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME}
 PUBLIC "${PROJECT_SOURCE_DIR}"
