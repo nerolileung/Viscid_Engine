@@ -10,12 +10,7 @@ set (ASSET_PATH "${PROJECT_SOURCE_DIR}/data")
 
 # add files to the executable
 add_executable(${CMAKE_PROJECT_NAME} main.cpp ${ASSET_PATH})
-if (APPLE)
-  file(COPY ${ASSET_PATH} DESTINATION "${PROJECT_BINARY_DIR}/")
-endif()
-if (WIN32)
-  file(COPY ${ASSET_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Debug/")
-endif()
+file(COPY ${ASSET_PATH} DESTINATION "${PROJECT_BINARY_DIR}/")
 
 add_subdirectory(framework)
 
@@ -47,54 +42,33 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_COMPILER clang++)
 
-# sdl
+# linking
+set(BUILD_SHARED_LIBS OFF)
+
 set(SDL2_MAC_API_LINK_FLAGS "-lm -liconv  -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-weak_framework,CoreHaptics -Wl,-weak_framework,GameController -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,CoreVideo -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-weak_framework,QuartzCore -Wl,-weak_framework,Metal")
+set(SDL2_TTF_MAC_FREETYPE_FLAGS "-L/opt/X11/lib -lfreetype")
 
-add_library(SDL2::SDL2 STATIC IMPORTED)
-set_target_properties(SDL2::SDL2 PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/framework/include/SDL2"
-  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-  IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2${CMAKE_STATIC_LIBRARY_SUFFIX}")
+target_link_directories(${CMAKE_PROJECT_NAME} PUBLIC "${PROJECT_SOURCE_DIR}/framework/lib/")
 
+if (WIN32)
+	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2)
+endif()
 if (APPLE)
-  set_property(TARGET SDL2::SDL2 PROPERTY INTERFACE_LINK_LIBRARIES "${SDL2_MAC_API_LINK_FLAGS}")
+	target_link_libraries(${CMAKE_PROJECT_NAME} ${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2${CMAKE_STATIC_LIBRARY_SUFFIX} ${SDL2_MAC_API_LINK_FLAGS})
 endif()
 
-add_library(SDL2::SDL2main STATIC IMPORTED)
-set_target_properties(SDL2::SDL2main PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-  IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2main${CMAKE_STATIC_LIBRARY_SUFFIX}")
+target_link_libraries(${CMAKE_PROJECT_NAME} SDL2main SDL2_image SDL2_mixer)
 
-# sdl_image
-add_library(SDL2::SDL2image STATIC IMPORTED)
-set_target_properties(SDL2::SDL2image PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-  IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_image${CMAKE_STATIC_LIBRARY_SUFFIX}")
-
-# sdl_mixer
-add_library(SDL2::SDL2mixer STATIC IMPORTED)
-set_target_properties(SDL2::SDL2mixer PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-  IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_mixer${CMAKE_STATIC_LIBRARY_SUFFIX}")
-
-# sdl_ttf
-add_library(SDL2::SDL2ttf STATIC IMPORTED)
-set(SDL_TTF_FREETYPE_FLAG "-L/opt/X11/lib -lfreetype")
-if (APPLE)
-  set_property(TARGET SDL2::SDL2ttf PROPERTY INTERFACE_LINK_LIBRARIES "${SDL_TTF_FREETYPE_FLAG}")
+if (WIN32)
+	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2_ttf)
 endif()
-set_target_properties(SDL2::SDL2ttf PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-  IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_ttf${CMAKE_STATIC_LIBRARY_SUFFIX}")
-
-target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2)
-target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2main)
-target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2image)
-target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2mixer)
-target_link_libraries(${CMAKE_PROJECT_NAME} SDL2::SDL2ttf)
+if(APPLE)
+	target_link_libraries(${CMAKE_PROJECT_NAME} ${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_ttf${CMAKE_STATIC_LIBRARY_SUFFIX} ${SDL2_TTF_MAC_FREETYPE_FLAGS})
+endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME}
 PUBLIC "${PROJECT_SOURCE_DIR}"
 PUBLIC "${PROJECT_SOURCE_DIR}/framework/"
-PUBLIC "${PROJECT_SOURCE_DIR}/include/"
 PUBLIC "${PROJECT_BINARY_DIR}")
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
