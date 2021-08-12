@@ -46,8 +46,8 @@ private:
     int myTileSize;
     int myTileMaxX;
     TilePooler* myTilePooler;
-    std::array<unsigned char,3> myUpcomingTiles;
-    std::vector<unsigned char> myUpcomingPattern;
+    std::array<unsigned char*,3> myUpcomingTiles;
+    std::vector<unsigned char*> myUpcomingPattern;
     int myTileAdvanceCounter;
     void AdvanceTiles(int offset);
     void UpdateUpcomingTiles();

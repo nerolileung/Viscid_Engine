@@ -3,24 +3,24 @@
 
 std::map<TilePatterns::PATTERNS, unsigned char> TilePatterns::myPatterns;
 
-unsigned char TilePatterns::GetPattern(PATTERNS key){
-    return myPatterns[key];
+unsigned char* TilePatterns::GetPattern(PATTERNS key){
+    return &myPatterns[key];
 }
 
-std::vector<unsigned char> TilePatterns::GetPattern(PATTERNS key, int size){
+std::vector<unsigned char*> TilePatterns::GetPattern(PATTERNS key, int size){
     if (size < 1) size = 1;
     int sizeHalf = std::ceilf(size / 2);
     if (sizeHalf < 1) sizeHalf = 1;
-    std::vector<unsigned char> pattern;
+    std::vector<unsigned char*> pattern;
 
     bool upperLevelObstacle = false;
-    unsigned char upperLevelFloor = 0x00;
+    unsigned char* upperLevelFloor = &myPatterns[PATTERNS::LOW_JUMP_GAP_REPEAT];
 
     if (key >= PATTERNS::MID_JUMP_BLOCK_START
         /* && key < PATTERNS::HIGH_FLOOR_LOW_FLOOR*/
     ){
         upperLevelObstacle = true;
-        upperLevelFloor = myPatterns[PATTERNS::MID_FLOOR_START];
+        upperLevelFloor = &myPatterns[PATTERNS::MID_FLOOR_START];
     }
     /*else if (key >= PATTERNS::HIGH_JUMP_BLOCK_LOW_FLOOR){
         upperLevelObstacle = true;
@@ -34,17 +34,17 @@ std::vector<unsigned char> TilePatterns::GetPattern(PATTERNS key, int size){
     }
 
     for (int i = 0; i < sizeHalf; i++){
-        pattern.push_back(myPatterns[key]);
+        pattern.push_back(&myPatterns[key]);
     }
 
     PATTERNS nextKey = (PATTERNS)(1+(int)key);
     for (int i = 0; i < size; i++){
-        pattern.push_back(myPatterns[nextKey]);
+        pattern.push_back(&myPatterns[nextKey]);
     }
     
     nextKey = (PATTERNS)(2+(int)key);
     for (int i = 0; i < sizeHalf; i++){
-        pattern.push_back(myPatterns[nextKey]);
+        pattern.push_back(&myPatterns[nextKey]);
     }
 
     if (upperLevelObstacle) {

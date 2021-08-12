@@ -252,20 +252,20 @@ void SceneLevel::AdvanceTiles(int offset){
     for (int i = 0; i < 8; i++){
         // is there a tile here?
         int FlagToCheck = (1 << i);
-        if ((myUpcomingTiles[1] & FlagToCheck) == 0) continue;
+        if ((*myUpcomingTiles[1] & FlagToCheck) == 0) continue;
 
         // determine sprite based on adjacent tiles
         int UpperFlagToCheck = (1 << (i-1));
         int LowerFlagToCheck = (1 << (i+1));
 
         int index = 0;
-        if ((myUpcomingTiles[0] & FlagToCheck) == 0) // left empty
+        if ((*myUpcomingTiles[0] & FlagToCheck) == 0) // left empty
             index += 1;
-        if ((myUpcomingTiles[2] & FlagToCheck) == 0) // right empty
+        if ((*myUpcomingTiles[2] & FlagToCheck) == 0) // right empty
             index += 2;
-        if (i == 0 || ((myUpcomingTiles[1] & UpperFlagToCheck) == 0)) // up
+        if (i == 0 || ((*myUpcomingTiles[1] & UpperFlagToCheck) == 0)) // up
             index += 4;
-        if (i == 7 || ((myUpcomingTiles[1] & LowerFlagToCheck) == 0)) // down
+        if (i == 7 || ((*myUpcomingTiles[1] & LowerFlagToCheck) == 0)) // down
             index += 8;
 
         SDL_Point spritePosition = { 300 * (index % 4), 300 * ((index - (index % 4)) / 4)};
