@@ -51,10 +51,10 @@ set(SDL2_TTF_MAC_FREETYPE_FLAGS "-L/opt/X11/lib -lfreetype")
 target_link_directories(${CMAKE_PROJECT_NAME} PUBLIC "${PROJECT_SOURCE_DIR}/framework/lib/")
 
 if (WIN32)
-	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2)
+	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2-static user32 gdi32 winmm imm32 ole32 oleaut32 version uuid advapi32 setupapi shell32)
 endif()
 if (APPLE)
-	target_link_libraries(${CMAKE_PROJECT_NAME} ${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2${CMAKE_STATIC_LIBRARY_SUFFIX} ${SDL2_MAC_API_LINK_FLAGS})
+	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2 ${SDL2_MAC_API_LINK_FLAGS})
 endif()
 
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2main SDL2_image SDL2_mixer)
@@ -63,7 +63,7 @@ if (WIN32)
 	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2_ttf)
 endif()
 if(APPLE)
-	target_link_libraries(${CMAKE_PROJECT_NAME} ${PROJECT_SOURCE_DIR}/framework/lib/${CMAKE_STATIC_LIBRARY_PREFIX}SDL2_ttf${CMAKE_STATIC_LIBRARY_SUFFIX} ${SDL2_TTF_MAC_FREETYPE_FLAGS})
+	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2_ttf ${SDL2_TTF_MAC_FREETYPE_FLAGS})
 endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME}
