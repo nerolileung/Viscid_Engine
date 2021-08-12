@@ -60,7 +60,7 @@ endif()
 target_link_libraries(${CMAKE_PROJECT_NAME} SDL2main SDL2_image SDL2_mixer)
 
 if (WIN32)
-	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2_ttf)
+	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2_ttf freetype)
 endif()
 if(APPLE)
 	target_link_libraries(${CMAKE_PROJECT_NAME} SDL2_ttf ${SDL2_TTF_MAC_FREETYPE_FLAGS})
