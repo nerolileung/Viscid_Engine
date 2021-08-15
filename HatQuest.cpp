@@ -116,14 +116,20 @@ void HatQuest::ChangeScene(SCENES newSceneType){
         }
     }
     // menu to level music
-    if ((myCurrentSceneType == MAIN_MENU || myCurrentSceneType == SETTINGS_MENU || myCurrentSceneType == END) && newSceneType == PLAYING)
-        Mix_FadeInMusic(levelBGM, -1, 100);
+    if ((myCurrentSceneType == MAIN_MENU || myCurrentSceneType == SETTINGS_MENU || myCurrentSceneType == END) && newSceneType == PLAYING){
+        Mix_FadeOutMusic(100);
+        Mix_FadeInMusic(levelBGM, -1, 1000);
+    }
     // restart level music
-    else if (myCurrentSceneType == PLAYING && newSceneType == PLAYING)
-        Mix_FadeInMusic(levelBGM, -1, 100);
+    else if (myCurrentSceneType == PLAYING && newSceneType == PLAYING){
+        Mix_FadeOutMusic(100);
+        Mix_FadeInMusic(levelBGM, -1, 1000);
+    }
     // level to menu music
-    else if (myCurrentSceneType == PLAYING && newSceneType != PLAYING)
-        Mix_FadeInMusic(menuBGM, -1, 100);
+    else if (myCurrentSceneType == PLAYING && newSceneType != PLAYING){
+        Mix_FadeOutMusic(100);
+        Mix_FadeInMusic(menuBGM, -1, 1000);
+    }
     // set up new scene
     switch (newSceneType){
         case MAIN_MENU:
