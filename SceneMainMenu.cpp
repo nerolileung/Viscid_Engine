@@ -28,7 +28,7 @@ bool SceneMainMenu::Init(SDL_Renderer* aRenderer){
     SDL_FreeSurface(headingSurface);
     if (myHeading == nullptr) return false;
     
-    SDL_Rect buttonPosition = {(int)(Game::WindowWidth*0.3f), (int)(Game::WindowHeight*0.5f), Game::WindowHeight*3/8, Game::WindowHeight*3/8};
+    SDL_Rect buttonPosition = {(int)(Game::WindowWidth*0.3f), (int)(Game::WindowHeight*0.5f), (int)(Game::WindowWidth*0.2f), (int)(Game::WindowWidth*0.2f)};
     myPlayButton = new UI_Button("data/mainmenu_button.png","   Play   ",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::HEIGHT);
     if (myPlayButton == nullptr) return false;
 

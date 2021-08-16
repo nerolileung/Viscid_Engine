@@ -13,12 +13,11 @@ SceneLevel::SceneLevel(){
     myControlInfoTimer = 3.f;
 
     // initialise background colour
-    myBackgroundColour[0] = 28.f - std::rand()%4;
-    myBackgroundColour[1] = 150.f + std::rand()%20;
-    myBackgroundColour[2] = 201.f - std::rand()%50;
-    myBackgroundColourChange[0] = 5;
-    myBackgroundColourChange[1] = 10;
-    myBackgroundColourChange[2] = -10;
+    myBackgroundColourHSV[0] = 120.f + std::rand()%50; // stick to greens
+    myBackgroundColourHSV[1] = (50.f + std::rand()%50)/100;
+    myBackgroundColourHSV[2] = (60.f + std::rand()%25)/100;
+    myBackgroundColourChange = 1;
+    BackgroundColourHSVToRGB();
 
     // initialise map
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
@@ -180,39 +179,59 @@ bool SceneLevel::Update(float deltaTime){
 }
 
 void SceneLevel::UpdateBackgroundColour(float deltaTime){
-    myBackgroundColour[0] += myBackgroundColourChange[0] * deltaTime;
-    if (myBackgroundColour[0] < 0) myBackgroundColour[0] = 0;
-    if (myBackgroundColour[0] > 150) myBackgroundColour[0] = 150;
-
-    myBackgroundColour[1] += myBackgroundColourChange[1] * deltaTime;
-    if (myBackgroundColour[1] < 0) myBackgroundColour[1] = 0;
-
-    myBackgroundColour[2] += myBackgroundColourChange[2] * deltaTime;
-    if (myBackgroundColour[2] < 0) myBackgroundColour[2] = 0;
+    // advance hue; swap direction at 100 and 290
+    myBackgroundColourHSV[0] += myBackgroundColourChange * deltaTime;
     
-    // green to blue
-    if (myBackgroundColour[1] >= 200){
-        myBackgroundColourChange[0] = -5;
-        myBackgroundColourChange[1] = -20;
-        myBackgroundColourChange[2] = 20;
+    if (myBackgroundColourHSV[0] <= 100 || myBackgroundColourHSV[0] >= 290){
+        // change direction
+        if (myBackgroundColourHSV[0] <= 100)
+            myBackgroundColourChange = 1;
+        else myBackgroundColourChange = -1;
+
+        // randomly change saturation or value
+        if (std::rand()%2 == 0){
+            // saturation between 50% - 100%
+            if (myBackgroundColourHSV[1] <= 0.5f)
+                myBackgroundColourHSV[1] += 0.05f;
+            else myBackgroundColourHSV[1] -= 0.05f;
+        }
+        else {
+            // value between 60% - 85%
+            if (myBackgroundColourHSV[2] <= 0.6f)
+                myBackgroundColourHSV[2] += 0.05f;
+            else if (myBackgroundColourHSV[2] >= 0.85f)
+                myBackgroundColourHSV[2] -= 0.05f;
+        }
     }
-    // blue to purple
-    else if (myBackgroundColourChange[2] == 20 && myBackgroundColour[2] > 160){
-        myBackgroundColourChange[0] = 30;
-        myBackgroundColourChange[1] = -30;
-        myBackgroundColourChange[2] = 15;
+
+    BackgroundColourHSVToRGB();
+}
+
+void SceneLevel::BackgroundColourHSVToRGB(){
+    float max = 255 * myBackgroundColourHSV[2];
+    float min = max * (1 - myBackgroundColourHSV[1]);
+    float hueConversion = std::remainderf(myBackgroundColourHSV[0]/60, 2.f);
+    float z = (max - min)*(1 - std::abs(hueConversion - 1));
+
+    if (myBackgroundColourHSV[0] < 120){
+        myBackgroundColourRGB[0] = z + min;
+        myBackgroundColourRGB[1] = max;
+        myBackgroundColourRGB[2] = min;
     }
-    // purple to blue
-    else if (myBackgroundColour[2] >= 200){
-        myBackgroundColourChange[0] = -20;
-        myBackgroundColourChange[1] = 10;
-        myBackgroundColourChange[2] = -10;
+    else if (myBackgroundColourHSV[0] < 180){
+        myBackgroundColourRGB[0] = min;
+        myBackgroundColourRGB[1] = max;
+        myBackgroundColourRGB[2] = z + min;
     }
-    // blue to green
-    else if (myBackgroundColourChange[0] == -20 && myBackgroundColour[0] < 0){
-        myBackgroundColourChange[0] = 5;
-        myBackgroundColourChange[1] = 10;
-        myBackgroundColourChange[2] = -10;
+    else if (myBackgroundColourHSV[0] < 240){
+        myBackgroundColourRGB[0] = min;
+        myBackgroundColourRGB[1] = z + min;
+        myBackgroundColourRGB[2] = max;
+    }
+    else { // should be hue < 290
+        myBackgroundColourRGB[0] = z + min;
+        myBackgroundColourRGB[1] = min;
+        myBackgroundColourRGB[2] = max;
     }
 }
 
@@ -324,7 +343,7 @@ void SceneLevel::UpdateHatPosition(float deltaTime){
 
 void SceneLevel::Render(SDL_Renderer* aRenderer){
     // background changes colour
-    SDL_SetRenderDrawColor(aRenderer, myBackgroundColour[0], myBackgroundColour[1], myBackgroundColour[2], SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(aRenderer, myBackgroundColourRGB[0], myBackgroundColourRGB[1], myBackgroundColourRGB[2], SDL_ALPHA_OPAQUE);
     SDL_RenderClear(aRenderer);
 
     // render regular screen

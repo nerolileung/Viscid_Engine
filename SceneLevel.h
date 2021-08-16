@@ -39,9 +39,11 @@ private:
     int myHatTargetY;
     void UpdateHatPosition(float deltaTime);
 
-    float myBackgroundColour[3];
-    int myBackgroundColourChange[3];
+    float myBackgroundColourHSV[3];
+    float myBackgroundColourRGB[3];
+    int myBackgroundColourChange;
     void UpdateBackgroundColour(float deltaTime);
+    void BackgroundColourHSVToRGB();
 
     int myTileSize;
     int myTileMaxX;

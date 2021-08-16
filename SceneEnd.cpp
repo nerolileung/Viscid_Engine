@@ -49,7 +49,7 @@ bool SceneEnd::Init(SDL_Renderer* aRenderer, float duration){
     if (myMainMenuButton == nullptr) return false;
 
     buttonPosition.x = Game::WindowWidth*0.5f;
-    buttonPosition.y = Game::WindowHeight*0.8f;
+    buttonPosition.y = Game::WindowHeight*0.75f;
     myQuitButton = new UI_Button("data/mainmenu_button.png","  Quit  ",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::NONE);
     if (myQuitButton == nullptr) return false;
 
