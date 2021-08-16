@@ -32,7 +32,6 @@ private:
     bool myTutorialDone;
 
     Mix_Music* menuBGM;
-    Mix_Music* levelBGM;
 };
 
 #endif // HATQUEST_H

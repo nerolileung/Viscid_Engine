@@ -17,7 +17,6 @@ HatQuest::HatQuest(){
     Scene::SetFonts(fonts);
 
     menuBGM = Mix_LoadMUS("data/mainmenu_bgm.wav");
-    levelBGM = Mix_LoadMUS("data/level_bgm.wav");
 }
 HatQuest::~HatQuest(){
     switch (myCurrentSceneType){
@@ -44,8 +43,6 @@ HatQuest::~HatQuest(){
     Mix_FadeOutMusic(10);
     Mix_FreeMusic(menuBGM);
     menuBGM = nullptr;
-    Mix_FreeMusic(levelBGM);
-    levelBGM = nullptr;
 }
 
 bool HatQuest::Update(float deltaTime){
@@ -115,15 +112,13 @@ void HatQuest::ChangeScene(SCENES newSceneType){
             break;
         }
     }
-    // menu to level music
+    // menu to level
     if ((myCurrentSceneType == MAIN_MENU || myCurrentSceneType == SETTINGS_MENU || myCurrentSceneType == END) && newSceneType == PLAYING){
         Mix_FadeOutMusic(100);
-        Mix_FadeInMusic(levelBGM, -1, 1000);
     }
     // restart level music
     else if (myCurrentSceneType == PLAYING && newSceneType == PLAYING){
         Mix_FadeOutMusic(100);
-        Mix_FadeInMusic(levelBGM, -1, 1000);
     }
     // level to menu music
     else if (myCurrentSceneType == PLAYING && newSceneType != PLAYING){

@@ -19,6 +19,16 @@ SceneLevel::SceneLevel(){
     myBackgroundColourChange = 1;
     BackgroundColourHSVToRGB();
 
+    // initialise background music
+    myBackgroundMusicBass = Mix_LoadWAV("data/level_bgm_bass_slow.wav");
+    myBackgroundMusicClips[0] = Mix_LoadWAV("data/level_bgm_green_slow.wav");
+    myBackgroundMusicClips[1] = Mix_LoadWAV("data/level_bgm_cyan_slow.wav");
+    myBackgroundMusicClips[2] = Mix_LoadWAV("data/level_bgm_green_slow.wav"); // todo
+    myBackgroundMusicClips[3] = Mix_LoadWAV("data/level_bgm_cyan_slow.wav");
+    
+    Mix_FadeInChannel(-1, myBackgroundMusicBass, -1, 1000);
+    myBackgroundMusicChannel = Mix_FadeInChannel(-1, myBackgroundMusicClips[0], 0, 1000);
+
     // initialise map
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
     TilePatterns::Init();
@@ -39,12 +49,17 @@ SceneLevel::SceneLevel(){
 }
 
 SceneLevel::~SceneLevel(){
+    // world objects
     delete myPlayer;
     myPlayer = nullptr;
 
     delete myTilePooler;
     myTilePooler = nullptr;
 
+    delete myHat;
+    myHat = nullptr;
+
+    // ui
     delete myPauseOverlay;
     myPauseOverlay = nullptr;
 
@@ -64,8 +79,14 @@ SceneLevel::~SceneLevel(){
         myControlInfo[2] = nullptr;
     }
 
-    delete myHat;
-    myHat = nullptr;
+    // music
+    Mix_FreeChunk(myBackgroundMusicBass);
+    myBackgroundMusicBass = nullptr;
+
+    for (int i = 0; i < 4; i++){
+        Mix_FreeChunk(myBackgroundMusicClips[i]);
+        myBackgroundMusicClips[i] = nullptr;
+    }
 }
 
 bool SceneLevel::Init(SDL_Renderer* aRenderer, bool playTutorial){
@@ -175,6 +196,10 @@ bool SceneLevel::Update(float deltaTime){
             
         myFinished = myPlayer->isDead(); // todo start delay to play ghost animation
     }
+
+    // bgm keeps going; todo drop volume when paused
+    UpdateBackgroundMusic(); 
+
     return true;
 }
 
@@ -182,56 +207,84 @@ void SceneLevel::UpdateBackgroundColour(float deltaTime){
     // advance hue; swap direction at 100 and 290
     myBackgroundColourHSV[0] += myBackgroundColourChange * deltaTime;
     
-    if (myBackgroundColourHSV[0] <= 100 || myBackgroundColourHSV[0] >= 290){
+    if ((myBackgroundColourHSV[0] < 100 && myBackgroundColourChange == -1)
+        || myBackgroundColourHSV[0] > 290 && myBackgroundColourChange == 1){
         // change direction
-        if (myBackgroundColourHSV[0] <= 100)
+        if (myBackgroundColourHSV[0] < 100)
             myBackgroundColourChange = 1;
         else myBackgroundColourChange = -1;
 
         // randomly change saturation or value
         if (std::rand()%2 == 0){
             // saturation between 50% - 100%
-            if (myBackgroundColourHSV[1] <= 0.5f)
+            if (myBackgroundColourHSV[1] < 0.5f)
                 myBackgroundColourHSV[1] += 0.05f;
             else myBackgroundColourHSV[1] -= 0.05f;
         }
         else {
             // value between 60% - 85%
-            if (myBackgroundColourHSV[2] <= 0.6f)
+            if (myBackgroundColourHSV[2] < 0.6f)
                 myBackgroundColourHSV[2] += 0.05f;
-            else if (myBackgroundColourHSV[2] >= 0.85f)
+            else if (myBackgroundColourHSV[2] > 0.85f)
                 myBackgroundColourHSV[2] -= 0.05f;
         }
     }
-
+    //std::cout << "HSV: " << myBackgroundColourHSV[0] << " " << myBackgroundColourHSV[1] << " " << myBackgroundColourHSV[2] << std::endl;
     BackgroundColourHSVToRGB();
 }
 
 void SceneLevel::BackgroundColourHSVToRGB(){
-    float max = 255 * myBackgroundColourHSV[2];
-    float min = max * (1 - myBackgroundColourHSV[1]);
-    float hueConversion = std::remainderf(myBackgroundColourHSV[0]/60, 2.f);
-    float z = (max - min)*(1 - std::abs(hueConversion - 1));
+    float chroma = myBackgroundColourHSV[2] * myBackgroundColourHSV[1];
+    float hueRGB = myBackgroundColourHSV[0]/60.f;
+    float intermediateX = chroma * (1 - std::abs(std::remainderf(hueRGB, 2.f) - 1));
+    if (intermediateX < 0) intermediateX *= -1; // temporary fix, todo figure out issue
 
-    if (myBackgroundColourHSV[0] < 120){
-        myBackgroundColourRGB[0] = z + min;
-        myBackgroundColourRGB[1] = max;
-        myBackgroundColourRGB[2] = min;
+    // find rgb point with same hue and chroma as hsv point
+    if (hueRGB < 2){ // hue between 60 and 120; shouldn't be lower than 100 though
+        myBackgroundColourRGB[0] = intermediateX;
+        myBackgroundColourRGB[1] = chroma;
+        myBackgroundColourRGB[2] = 0;
     }
-    else if (myBackgroundColourHSV[0] < 180){
-        myBackgroundColourRGB[0] = min;
-        myBackgroundColourRGB[1] = max;
-        myBackgroundColourRGB[2] = z + min;
+    else if (hueRGB < 3){ // hue between 120 and 180 
+        myBackgroundColourRGB[0] = 0;
+        myBackgroundColourRGB[1] = chroma;
+        myBackgroundColourRGB[2] = intermediateX;
     }
-    else if (myBackgroundColourHSV[0] < 240){
-        myBackgroundColourRGB[0] = min;
-        myBackgroundColourRGB[1] = z + min;
-        myBackgroundColourRGB[2] = max;
+    else if (hueRGB < 4){ // hue between 180 and 240
+        myBackgroundColourRGB[0] = 0;
+        myBackgroundColourRGB[1] = intermediateX;
+        myBackgroundColourRGB[2] = chroma;
     }
-    else { // should be hue < 290
-        myBackgroundColourRGB[0] = z + min;
-        myBackgroundColourRGB[1] = min;
-        myBackgroundColourRGB[2] = max;
+    else { // should be hue < 290, hueRGB (h') < 5
+        myBackgroundColourRGB[0] = intermediateX;
+        myBackgroundColourRGB[1] = 0;
+        myBackgroundColourRGB[2] = chroma;
+    }
+
+    // match rgb point's value 
+    float valueDifference = myBackgroundColourHSV[2] - chroma;
+    myBackgroundColourRGB[0] = std::roundf(255 * (myBackgroundColourRGB[0] + valueDifference));
+    myBackgroundColourRGB[1] = std::roundf(255 * (myBackgroundColourRGB[1] + valueDifference));
+    myBackgroundColourRGB[2] = std::roundf(255 * (myBackgroundColourRGB[2] + valueDifference));
+
+    /*std::cout << "vars: "<< chroma << " "<<hueRGB<<" "<<intermediateX<<" "<<valueDifference<<std::endl;
+    std::cout << "RGB: " << myBackgroundColourRGB[0] << " " << myBackgroundColourRGB[1] << " " << myBackgroundColourRGB[2] << std::endl << std::endl;*/
+}
+
+void SceneLevel::UpdateBackgroundMusic(){
+    // play new clip if the previous one ended
+    if (Mix_Playing(myBackgroundMusicChannel) == 0){
+        // pick different melody clip based on bg colour
+        int melodyIndex = -1;
+        if (myBackgroundColourHSV[0] < 120)
+            melodyIndex = 0;
+        else if (myBackgroundColourHSV[0] < 180)
+            melodyIndex = 1;
+        else if (myBackgroundColourHSV[0] < 240)
+            melodyIndex = 2;
+        else melodyIndex = 3;
+
+        Mix_PlayChannel(myBackgroundMusicChannel, myBackgroundMusicClips[melodyIndex], 0);
     }
 }
 

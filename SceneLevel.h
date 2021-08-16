@@ -7,6 +7,7 @@
 #include "framework/UI_Button.h"
 #include <vector>
 #include <array>
+#include "framework/include/SDL2/SDL_mixer.h"
 
 class SceneLevel : public Scene {
 public:
@@ -44,6 +45,11 @@ private:
     int myBackgroundColourChange;
     void UpdateBackgroundColour(float deltaTime);
     void BackgroundColourHSVToRGB();
+
+    Mix_Chunk* myBackgroundMusicBass;
+    Mix_Chunk* myBackgroundMusicClips[4];
+    int myBackgroundMusicChannel;
+    void UpdateBackgroundMusic();
 
     int myTileSize;
     int myTileMaxX;
