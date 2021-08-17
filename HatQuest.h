@@ -3,7 +3,6 @@
 
 #include "framework/Game.h"
 #include "framework/include/SDL2/SDL_ttf.h"
-#include "framework/include/SDL2/SDL_mixer.h"
 #include <vector>
 
 class Scene;
@@ -31,7 +30,7 @@ private:
     float levelTime;
     bool myTutorialDone;
 
-    Mix_Music* menuBGM;
+    int menuBGM;
 };
 
 #endif // HATQUEST_H

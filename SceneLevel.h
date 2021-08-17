@@ -46,9 +46,8 @@ private:
     void UpdateBackgroundColour(float deltaTime);
     void BackgroundColourHSVToRGB();
 
-    Mix_Chunk* myBackgroundMusicBass;
-    Mix_Chunk* myBackgroundMusicClips[4];
-    int myBackgroundMusicChannel;
+    int myBackgroundMusicBass;
+    int myBackgroundMusicClips[4];
     void UpdateBackgroundMusic();
 
     int myTileSize;

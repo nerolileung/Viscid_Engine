@@ -3,6 +3,7 @@
 #include "SceneLevel.h"
 #include "SceneEnd.h"
 #include <iostream>
+#include "framework/AudioSystem.h"
 
 HatQuest::HatQuest(){
     myCurrentSceneType = MAIN_MENU;
@@ -16,7 +17,7 @@ HatQuest::HatQuest(){
     fonts.push_back(TTF_OpenFont("data/caprice-medium.ttf", 50));
     Scene::SetFonts(fonts);
 
-    menuBGM = Mix_LoadMUS("data/mainmenu_bgm.wav");
+    menuBGM = AudioSystem::LoadMusic("data/mainmenu_bgm.wav");
 }
 HatQuest::~HatQuest(){
     switch (myCurrentSceneType){
@@ -41,16 +42,13 @@ HatQuest::~HatQuest(){
     }
 
     Mix_FadeOutMusic(10);
-    Mix_FreeMusic(menuBGM);
-    menuBGM = nullptr;
 }
 
 bool HatQuest::Update(float deltaTime){
     // start playing bgm on first update after logos get displayed
-    if (myCurrentSceneType == SCENES::MAIN_MENU && 
-    (Mix_PlayingMusic() == 0 && Mix_FadingMusic() != MIX_FADING_IN)){
-        Mix_FadeInMusic(menuBGM, -1, 100);
-    }
+    if (myCurrentSceneType == SCENES::MAIN_MENU && !AudioSystem::IsMusicPlaying())
+        AudioSystem::PlayMusic(menuBGM);
+    
 
     // move to new scene
     if (myCurrentScene->isFinished()){
@@ -114,16 +112,15 @@ void HatQuest::ChangeScene(SCENES newSceneType){
     }
     // menu to level
     if ((myCurrentSceneType == MAIN_MENU || myCurrentSceneType == SETTINGS_MENU || myCurrentSceneType == END) && newSceneType == PLAYING){
-        Mix_FadeOutMusic(100);
+        AudioSystem::StopMusic();
     }
     // restart level music
     else if (myCurrentSceneType == PLAYING && newSceneType == PLAYING){
-        Mix_FadeOutMusic(100);
+        AudioSystem::StopMusic();
     }
     // level to menu music
     else if (myCurrentSceneType == PLAYING && newSceneType != PLAYING){
-        Mix_FadeOutMusic(100);
-        Mix_FadeInMusic(menuBGM, -1, 1000);
+        AudioSystem::PlayMusic(menuBGM);
     }
     // set up new scene
     switch (newSceneType){

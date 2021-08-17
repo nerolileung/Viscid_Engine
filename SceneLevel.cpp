@@ -1,6 +1,7 @@
 #include "SceneLevel.h"
-#include <cmath>
 #include "TilePatterns.h"
+#include <cmath>
+#include "framework/AudioSystem.h"
 
 SceneLevel::SceneLevel(){
     // level flags
@@ -14,21 +15,24 @@ SceneLevel::SceneLevel(){
 
     // initialise background colour
     myBackgroundColourHSV[0] = 120.f + std::rand()%50; // stick to greens
-    myBackgroundColourHSV[1] = (50.f + std::rand()%50)/100;
+    myBackgroundColourHSV[1] = (50.f + std::rand()%40)/100;
     myBackgroundColourHSV[2] = (60.f + std::rand()%25)/100;
     myBackgroundColourChange = 1;
     BackgroundColourHSVToRGB();
 
     // initialise background music
-    myBackgroundMusicBass = Mix_LoadWAV("data/level_bgm_bass_slow.wav");
-    myBackgroundMusicClips[0] = Mix_LoadWAV("data/level_bgm_green_slow.wav");
-    myBackgroundMusicClips[1] = Mix_LoadWAV("data/level_bgm_cyan_slow.wav");
-    myBackgroundMusicClips[2] = Mix_LoadWAV("data/level_bgm_green_slow.wav"); // todo
-    myBackgroundMusicClips[3] = Mix_LoadWAV("data/level_bgm_cyan_slow.wav");
+    myBackgroundMusicBass = AudioSystem::LoadClip("data/level_bgm_bass_slow.wav");
+    myBackgroundMusicClips[0] = AudioSystem::LoadClip("data/level_bgm_green_slow.wav");
+    myBackgroundMusicClips[1] = AudioSystem::LoadClip("data/level_bgm_cyan_slow.wav");
+    myBackgroundMusicClips[2] = AudioSystem::LoadClip("data/level_bgm_indigo_slow.wav");
+    myBackgroundMusicClips[3] = AudioSystem::LoadClip("data/level_bgm_purple_slow.wav");
     
-    Mix_FadeInChannel(-1, myBackgroundMusicBass, -1, 1000);
-    myBackgroundMusicChannel = Mix_FadeInChannel(-1, myBackgroundMusicClips[0], 0, 1000);
-
+    // use channels 0 and 1 for level bgm's bass and melody
+    AudioSystem::SetVolumeClips(AudioSystem::GetVolumeMusic(),0);
+    AudioSystem::SetVolumeClips(AudioSystem::GetVolumeMusic(),1);
+    AudioSystem::PlayClipFade(myBackgroundMusicBass, -1, 0);
+    AudioSystem::PlayClipFade(myBackgroundMusicClips[0], 0, 1);
+    
     // initialise map
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
     TilePatterns::Init();
@@ -79,14 +83,11 @@ SceneLevel::~SceneLevel(){
         myControlInfo[2] = nullptr;
     }
 
-    // music
-    Mix_FreeChunk(myBackgroundMusicBass);
-    myBackgroundMusicBass = nullptr;
-
-    for (int i = 0; i < 4; i++){
-        Mix_FreeChunk(myBackgroundMusicClips[i]);
-        myBackgroundMusicClips[i] = nullptr;
-    }
+    // stop bgm, return mix channels 0 and 1 to default sfx volume
+    Mix_FadeOutChannel(0, 100);
+    Mix_FadeOutChannel(1, 100);
+    AudioSystem::SetVolumeClips(AudioSystem::GetVolumeSFX(-1),0);
+    AudioSystem::SetVolumeClips(AudioSystem::GetVolumeSFX(-1),1);
 }
 
 bool SceneLevel::Init(SDL_Renderer* aRenderer, bool playTutorial){
@@ -216,10 +217,11 @@ void SceneLevel::UpdateBackgroundColour(float deltaTime){
 
         // randomly change saturation or value
         if (std::rand()%2 == 0){
-            // saturation between 50% - 100%
+            // saturation between 50% - 90%
             if (myBackgroundColourHSV[1] < 0.5f)
                 myBackgroundColourHSV[1] += 0.05f;
-            else myBackgroundColourHSV[1] -= 0.05f;
+            else if (myBackgroundColourHSV[1] < 0.9f)
+                myBackgroundColourHSV[1] -= 0.05f;
         }
         else {
             // value between 60% - 85%
@@ -273,7 +275,7 @@ void SceneLevel::BackgroundColourHSVToRGB(){
 
 void SceneLevel::UpdateBackgroundMusic(){
     // play new clip if the previous one ended
-    if (Mix_Playing(myBackgroundMusicChannel) == 0){
+    if (Mix_Playing(1) == 0){
         // pick different melody clip based on bg colour
         int melodyIndex = -1;
         if (myBackgroundColourHSV[0] < 120)
@@ -284,7 +286,7 @@ void SceneLevel::UpdateBackgroundMusic(){
             melodyIndex = 2;
         else melodyIndex = 3;
 
-        Mix_PlayChannel(myBackgroundMusicChannel, myBackgroundMusicClips[melodyIndex], 0);
+        AudioSystem::PlayClip(myBackgroundMusicClips[melodyIndex], 0, 1);
     }
 }
 
