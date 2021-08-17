@@ -29,12 +29,12 @@ bool SceneMainMenu::Init(SDL_Renderer* aRenderer){
     if (myHeading == nullptr) return false;
     
     SDL_Rect buttonPosition = {(int)(Game::WindowWidth*0.3f), (int)(Game::WindowHeight*0.5f), (int)(Game::WindowWidth*0.2f), (int)(Game::WindowWidth*0.2f)};
-    myPlayButton = new UI_Button("data/mainmenu_button.png","   Play   ",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::HEIGHT);
+    myPlayButton = new UI_Button("data/mainmenu_button.png",aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::HEIGHT,"   Play   ",gameFonts[1],gameFontColours[0],"data/button_sfx.wav");
     if (myPlayButton == nullptr) return false;
 
     buttonPosition.x = Game::WindowWidth*0.7f;
     buttonPosition.y = Game::WindowHeight*0.7f;
-    myQuitButton = new UI_Button("data/mainmenu_button.png","   Quit   ",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::HEIGHT);
+    myQuitButton = new UI_Button("data/mainmenu_button.png",aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::HEIGHT,"   Quit   ",gameFonts[1],gameFontColours[0],"data/button_sfx.wav");
     if (myQuitButton == nullptr) return false;
 
     return true;

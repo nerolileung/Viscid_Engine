@@ -17,7 +17,7 @@ private:
     float timerFreeze;
     float timerFadeIn;
     float timerFadeOut;
-    Mix_Chunk* sfx;
+    int sfx;
     float sfxTimestamp;
     bool sfxPlayed;
 };

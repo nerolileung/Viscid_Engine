@@ -110,15 +110,15 @@ bool SceneLevel::Init(SDL_Renderer* aRenderer, bool playTutorial){
     if (myPauseOverlay == nullptr) return false;
     // todo different buttons?
     SDL_Rect pauseButtonPosition = {(int)(Game::WindowWidth*0.1f + myTileSize), (int)(Game::WindowHeight*0.5f), myTileSize*2, myTileSize*2};
-    myRestartButton = new UI_Button("data/mainmenu_button.png"," Restart ",gameFonts[1],gameFontColours[0],aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE);
+    myRestartButton = new UI_Button("data/mainmenu_button.png",aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE," Restart ",gameFonts[1],gameFontColours[0],"data/button_sfx.wav");
     if (myRestartButton == nullptr) return false;
 
     pauseButtonPosition.x = Game::WindowWidth*0.5f;
-    myQuitButton = new UI_Button("data/mainmenu_button.png","  Quit  ",gameFonts[1],gameFontColours[0],aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE);
+    myQuitButton = new UI_Button("data/mainmenu_button.png",aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE,"  Quit  ",gameFonts[1],gameFontColours[0],"data/button_sfx.wav");
     if (myQuitButton == nullptr) return false;
 
     pauseButtonPosition.x = Game::WindowWidth*0.9f - myTileSize;
-    myMainMenuButton = new UI_Button("data/mainmenu_button.png","Main Menu",gameFonts[1],gameFontColours[0],aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE);
+    myMainMenuButton = new UI_Button("data/mainmenu_button.png",aRenderer,pauseButtonPosition,UI_Element::ASPECT_RATIO::NONE,"Main Menu",gameFonts[1],gameFontColours[0],"data/button_sfx.wav");
     if (myMainMenuButton == nullptr) return false;
     
     if (playTutorial){

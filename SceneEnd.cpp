@@ -41,16 +41,16 @@ bool SceneEnd::Init(SDL_Renderer* aRenderer, float duration){
     if (myBackground == nullptr) return false;
 
     SDL_Rect buttonPosition = {(int)(Game::WindowWidth*0.3f), (int)(Game::WindowHeight*0.2f), (int)(Game::WindowHeight*0.3f), (int)(Game::WindowHeight*0.3f)};
-    myRestartButton = new UI_Button("data/mainmenu_button.png","Play Again",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::NONE);
+    myRestartButton = new UI_Button("data/mainmenu_button.png",aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::NONE,"Play Again",gameFonts[1],gameFontColours[0],"data/button_sfx.wav");
     if (myRestartButton == nullptr) return false;
 
     buttonPosition.x = Game::WindowWidth*0.7f;
-    myMainMenuButton = new UI_Button("data/mainmenu_button.png","Main Menu",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::NONE);
+    myMainMenuButton = new UI_Button("data/mainmenu_button.png",aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::NONE,"Main Menu",gameFonts[1],gameFontColours[0],"data/button_sfx.wav");
     if (myMainMenuButton == nullptr) return false;
 
     buttonPosition.x = Game::WindowWidth*0.5f;
     buttonPosition.y = Game::WindowHeight*0.75f;
-    myQuitButton = new UI_Button("data/mainmenu_button.png","  Quit  ",gameFonts[1],gameFontColours[0],aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::NONE);
+    myQuitButton = new UI_Button("data/mainmenu_button.png",aRenderer,buttonPosition,UI_Element::ASPECT_RATIO::NONE,"  Quit  ",gameFonts[1],gameFontColours[0],"data/button_sfx.wav");
     if (myQuitButton == nullptr) return false;
 
     return true;

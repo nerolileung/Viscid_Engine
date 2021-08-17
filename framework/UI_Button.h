@@ -6,15 +6,26 @@
 
 class UI_Button : public UI_Element {
 public:
-    // background image only
-    UI_Button(const char* texturePath, SDL_Renderer* aRenderer, float xPos, float yPos);
-    UI_Button(const char* texturePath, SDL_Renderer* aRenderer, SDL_Rect aPosition, ASPECT_RATIO ratio);
-    // text only
-    UI_Button(const char* text, TTF_Font* aFont, SDL_Color aFontColour, SDL_Renderer* aRenderer, float xPos, float yPos);
-    UI_Button(const char* text, TTF_Font* aFont, SDL_Color aFontColour, SDL_Renderer* aRenderer, SDL_Rect aPosition, ASPECT_RATIO ratio);
-    // both
-    UI_Button(const char* texturePath, const char* text, TTF_Font* aFont, SDL_Color aFontColour, SDL_Renderer* aRenderer, float xPos, float yPos);
-    UI_Button(const char* texturePath, const char* text, TTF_Font* aFont, SDL_Color aFontColour, SDL_Renderer* aRenderer, SDL_Rect aPosition, ASPECT_RATIO ratio);
+    // we always have a renderer and position
+    // button may have image (inherits from ui_element) and/or text (doesn't), may or may not have sfx
+
+    // render full text/image
+    UI_Button(SDL_Renderer* aRenderer, float xPos, float yPos,
+        const char* text = nullptr, TTF_Font* aFont = nullptr, SDL_Color aFontColour = {0,0,0,0},
+        const char* clickSFXFile = nullptr, const char* hoverSFXFile = nullptr);
+    UI_Button(const char* texturePath,
+        SDL_Renderer* aRenderer, float xPos, float yPos,
+        const char* text = nullptr, TTF_Font* aFont = nullptr, SDL_Color aFontColour = {0,0,0,0},
+        const char* clickSFXFile = nullptr, const char* hoverSFXFile = nullptr);
+
+    // resize text/image to fit given rectange/aspect ratio
+    UI_Button(SDL_Renderer* aRenderer, SDL_Rect aPosition, ASPECT_RATIO ratio,
+        const char* text = nullptr, TTF_Font* aFont = nullptr, SDL_Color aFontColour = {0,0,0,0},
+        const char* clickSFXFile = nullptr, const char* hoverSFXFile = nullptr);
+    UI_Button(const char* texturePath,
+        SDL_Renderer* aRenderer, SDL_Rect aPosition, ASPECT_RATIO ratio,
+        const char* text = nullptr, TTF_Font* aFont = nullptr, SDL_Color aFontColour = {0,0,0,0},
+        const char* clickSFXFile = nullptr, const char* hoverSFXFile = nullptr);
 
     ~UI_Button();
     void Update(float deltaTime) override;
@@ -25,6 +36,8 @@ protected:
     SDL_Rect myTextPosition;
     bool myClicked;
     bool myHovering;
+    int myHoverSFXID;
+    int myClickSFXID;
 };
 
 #endif // UI_BUTTON_H

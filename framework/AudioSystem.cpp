@@ -88,7 +88,7 @@ bool AudioSystem::PlayMusic(int id){
 }
 
 // default is 0 loops, -1 will be infinite loops
-bool AudioSystem::PlayClip(const char* filename, int loops = 0, int channel = -1){
+bool AudioSystem::PlayClip(const char* filename, int loops, int channel){
     // validate filename
     if (clipFiles.count(filename) == 0)
         return false;
@@ -97,7 +97,7 @@ bool AudioSystem::PlayClip(const char* filename, int loops = 0, int channel = -1
     return true;
 }
 
-bool AudioSystem::PlayClip(int id, int loops = 0, int channel = -1){
+bool AudioSystem::PlayClip(int id, int loops, int channel){
     // validate id and filename
     if (id < 0 || id >= clipKeys.size() ||
         clipFiles.count(clipKeys[id]) == 0)
@@ -107,7 +107,7 @@ bool AudioSystem::PlayClip(int id, int loops = 0, int channel = -1){
     return true;
 }
 
-bool AudioSystem::PlayClipFade(const char* filename, int loops = 0, int channel = -1){
+bool AudioSystem::PlayClipFade(const char* filename, int loops, int channel){
     // validate filename
     if (clipFiles.count(filename) == 0)
         return false;
@@ -116,7 +116,7 @@ bool AudioSystem::PlayClipFade(const char* filename, int loops = 0, int channel 
     return true;
 }
 
-bool AudioSystem::PlayClipFade(int id, int loops = 0, int channel = -1){
+bool AudioSystem::PlayClipFade(int id, int loops, int channel){
     // validate id and filename
     if (id < 0 || id >= clipKeys.size() ||
         clipFiles.count(clipKeys[id]) == 0)
@@ -135,7 +135,7 @@ void AudioSystem::SetVolumeMusic(int newVolume){
     volumeMusicCurrent = newVolume;
 }
 
-void AudioSystem::SetVolumeClips(int newVolume, int channel = -1){
+void AudioSystem::SetVolumeClips(int newVolume, int channel){
     Mix_Volume(channel, newVolume);
     volumeSFXCurrent = newVolume;
 }
@@ -146,7 +146,7 @@ void AudioSystem::SetVolumeMaster(int newVolume){
     volumeMasterCurrent = newVolume;
 }
 
-int AudioSystem::GetVolumeSFX(int channel = -1){
+int AudioSystem::GetVolumeSFX(int channel){
     if (channel == -1) return volumeSFXCurrent;
     else return Mix_Volume(channel, -1);
 }
