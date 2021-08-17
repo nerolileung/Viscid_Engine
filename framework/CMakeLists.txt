@@ -9,4 +9,6 @@ framework/UI_Button.h
 framework/UI_Button.cpp
 framework/Collisions.h
 framework/Collisions.cpp
+framework/AudioSystem.h
+framework/AudioSystem.cpp
 )
