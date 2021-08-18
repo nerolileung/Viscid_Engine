@@ -16,19 +16,19 @@ public:
 
     static void StopMusic();
 
-    static bool PlayClip(const char* filename, int loops, int channel);
-    static bool PlayClip(int id, int loops, int channel);
+    static bool PlayClip(const char* filename, int loops = 0, int channel = -1);
+    static bool PlayClip(int id, int loops = 0, int channel = -1);
     // set up bit flags for various fx if this gets bloated
-    static bool PlayClipFade(const char* filename, int loops, int channel);
-    static bool PlayClipFade(int id, int loops, int channel);
+    static bool PlayClipFade(const char* filename, int loops = 0, int channel = -1);
+    static bool PlayClipFade(int id, int loops = 0, int channel = -1);
 
     static void SetVolumeMaster(int newVolume);
     static void SetVolumeMusic(int newVolume);
-    static void SetVolumeClips(int newVolume, int channel);
+    static void SetVolumeClips(int newVolume, int channel = -1);
 
     static int GetVolumeMaster() { return volumeMasterCurrent; };
     static int GetVolumeMusic() { return volumeMusicCurrent; };
-    static int GetVolumeSFX(int channel);
+    static int GetVolumeSFX(int channel = -1);
 
     static bool IsMusicPlaying();
 

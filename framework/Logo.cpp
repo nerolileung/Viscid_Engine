@@ -2,6 +2,7 @@
 #include <string>
 #include <cmath>
 #include "include/SDL2/SDL_image.h"
+#include "framework/AudioSystem.h"
 
 Logo::Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath, float duration, float sfxOffset){
     // load image
@@ -11,8 +12,8 @@ Logo::Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath, 
 
     // load audio (if present)
     if (sfxPath != nullptr)
-        sfx = Mix_LoadWAV(sfxPath);
-    else sfx = nullptr;
+        sfx = AudioSystem::LoadClip(sfxPath);
+    else sfx = -1;
 
     // variables
     finished = false;
@@ -26,10 +27,6 @@ Logo::Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath, 
 Logo::~Logo(){
     SDL_DestroyTexture(image);
     image = nullptr;
-    if (sfx != nullptr){
-        Mix_FreeChunk(sfx);
-        sfx = nullptr;
-    }
 }
 
 void Logo::Update(float deltaTime){
@@ -58,10 +55,10 @@ void Logo::Update(float deltaTime){
     SDL_SetTextureAlphaMod(image, alpha);
     
     // audio
-    if (sfx != nullptr){
+    if (sfx > -1){
         sfxTimestamp -= deltaTime;
         if (sfxTimestamp < 0 && !sfxPlayed){
-            Mix_PlayChannel(-1, sfx, 0);
+            AudioSystem::PlayClip(sfx);
             sfxPlayed = true;
         }
     }
