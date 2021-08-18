@@ -119,10 +119,15 @@ void Character::Update(float deltaTime, float speed){
         {
             if (myState == PLAYER_STATE::SLIDING)
                 ChangeState(PLAYER_STATE::RUNNING);
+            else if (myState == PLAYER_STATE::SLIDING_FALLING)
+                ChangeState(PLAYER_STATE::RUNNING_FALLING);
         }
         
         UpdatePosition(deltaTime, speed);
         CheckFallingDeath();
+        // only play sfx if player character actually dies
+        if (myState == PLAYER_STATE::DEAD)
+            AudioSystem::PlayClip(myDieSFX);
     }
 }
 
@@ -162,21 +167,13 @@ void Character::UpdatePosition(float deltaTime, float speed){
             bool playerPushedOntoTile = false;
             
             for (int i = 0; i < tiles.size(); i++){
-                if (myState == PLAYER_STATE::JUMPING || myState == PLAYER_STATE::SLIDING_FALLING){
+                if (myState == PLAYER_STATE::JUMPING){
                     // tile's y position should be close to bottom edge of player to count as landing
-                    if (tiles[i]->GetPosition().y - (myPosition.y + (myPosition.h/2)) < 1){
-                        switch (myState){
-                            case PLAYER_STATE::JUMPING:
-                                ChangeState(PLAYER_STATE::RUNNING);
-                                // readjust collision box for checking
-                                checkPosition = myPosition;
-                                checkPosition.h = gameUnit;
-                            break;
-                            case PLAYER_STATE::SLIDING_FALLING:
-                                ChangeState(PLAYER_STATE::SLIDING);
-                            break;
-                            default: break;
-                        }
+                    if (tiles[i]->GetPosition().y - (myPosition.y + (myPosition.h/2)) < 0){
+                        ChangeState(PLAYER_STATE::RUNNING);
+                        // readjust collision box for checking
+                        checkPosition = myPosition;
+                        checkPosition.h = gameUnit;
                     }
                     else continue;
                 }
@@ -190,18 +187,24 @@ void Character::UpdatePosition(float deltaTime, float speed){
                     
                     if (Collisions::Box(checkPosition,centeredPosition)){
                         // push player on top of tile; avoid snapping to it
-                        if (tiles[i]->GetPosition().y - (myPosition.y + (myPosition.h/2)) < 1){
+                        if (tiles[i]->GetPosition().y - (myPosition.y + (myPosition.h/2)) < -1){
                             myPosition.y = tiles[i]->GetPosition().y - (myPosition.h/2);
                             playerPushedOntoTile = true;
                             if (myState == PLAYER_STATE::RUNNING_FALLING)
                                 ChangeState(PLAYER_STATE::RUNNING);
+                            else if (myState == PLAYER_STATE::SLIDING_FALLING)
+                                ChangeState(PLAYER_STATE::SLIDING);
                         }
                     }
                     highestTileY = tiles[i]->GetPosition().y;
                 }
             }
-            /*if (!playerPushedOntoTile && myState == PLAYER_STATE::RUNNING)
-                ChangeState(PLAYER_STATE::RUNNING_FALLING);*/
+            if (!playerPushedOntoTile){
+                if (myState == PLAYER_STATE::RUNNING)
+                    ChangeState(PLAYER_STATE::RUNNING_FALLING);
+                else if (myState == PLAYER_STATE::SLIDING)
+                    ChangeState(PLAYER_STATE::SLIDING_FALLING);
+            }
         }
     }
     mySprites[myCurrentSpriteIndex]->SetPositionCentre({myPosition.x,myPosition.y});
@@ -219,26 +222,38 @@ void Character::ChangeState(PLAYER_STATE aState){
 
     // update position to new midpoint
     // don't change sprites between running/sliding and their falling versions
-    if ((aState == PLAYER_STATE::RUNNING_FALLING && myState != PLAYER_STATE::RUNNING)
-        || (aState == PLAYER_STATE::RUNNING && myState != PLAYER_STATE::RUNNING_FALLING))
-        myCurrentSpriteIndex = PLAYER_STATE::RUNNING;
-    else if ((aState == PLAYER_STATE::SLIDING_FALLING && myState != PLAYER_STATE::SLIDING)
-        || (aState == PLAYER_STATE::SLIDING && myState != PLAYER_STATE::SLIDING_FALLING))
-        myCurrentSpriteIndex = PLAYER_STATE::SLIDING;
+    bool ignoreSpriteChange = false;
+    if (aState == PLAYER_STATE::RUNNING_FALLING) {
+        if (myState != PLAYER_STATE::RUNNING)
+            myCurrentSpriteIndex = PLAYER_STATE::RUNNING;
+        else ignoreSpriteChange = true;
+    }
+    else if (aState == PLAYER_STATE::SLIDING_FALLING) {
+        if (myState != PLAYER_STATE::SLIDING)
+            myCurrentSpriteIndex = PLAYER_STATE::SLIDING;
+        else ignoreSpriteChange = true;
+    }
     else myCurrentSpriteIndex = aState;
-    myPosition = mySprites[myCurrentSpriteIndex]->GetDimensions();
-    myPosition.x = originalPosition.x - (myPosition.w / 2);
-    myPosition.y = originalPosition.y - (myPosition.h / 2);
+    if (!ignoreSpriteChange){
+        myPosition = mySprites[myCurrentSpriteIndex]->GetDimensions();
+        myPosition.x = originalPosition.x - (myPosition.w / 2);
+        myPosition.y = originalPosition.y - (myPosition.h / 2);
+    }
 
     // update other logic
     switch (aState){
         case PLAYER_STATE::RUNNING:
             // resize hitbox, allow player to fall down 1-wide holes; sprite is unaffected
-            myPosition.w *= 0.75f;
+            if (myState != PLAYER_STATE::RUNNING_FALLING)
+                myPosition.w *= 0.75f;
 
             // sfx
             if (myState == PLAYER_STATE::JUMPING || myState == PLAYER_STATE::RUNNING_FALLING)
                 AudioSystem::PlayClip(myJumpLandSFX);
+        break;
+        case PLAYER_STATE::RUNNING_FALLING:
+            if (myState != PLAYER_STATE::RUNNING)
+                myPosition.w *= 0.75f;
         break;
         case PLAYER_STATE::JUMPING:
             myJumpTimerCurrent = myJumpTimerMax;
@@ -250,9 +265,6 @@ void Character::ChangeState(PLAYER_STATE aState){
             // play sfx only when hitting the ground
             if (myState == PLAYER_STATE::SLIDING_FALLING || myState == PLAYER_STATE::RUNNING)
                 AudioSystem::PlayClip(mySlideSFX);
-        break;
-        case PLAYER_STATE::DEAD:
-            AudioSystem::PlayClip(myDieSFX);
         break;
         default: break;
     }

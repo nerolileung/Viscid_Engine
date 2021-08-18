@@ -18,6 +18,7 @@ HatQuest::HatQuest(){
     Scene::SetFonts(fonts);
 
     menuBGM = AudioSystem::LoadMusic("data/mainmenu_bgm.wav");
+    AudioSystem::SetVolumeMaster(MIX_MAX_VOLUME * 0.8f);
 }
 HatQuest::~HatQuest(){
     switch (myCurrentSceneType){
