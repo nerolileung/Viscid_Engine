@@ -18,8 +18,10 @@ public:
 private:
     enum PLAYER_STATE {
         RUNNING = 0,
+        RUNNING_FALLING = 1,
         JUMPING = 2,
         SLIDING = 4,
+        SLIDING_FALLING = 5,
         DEAD = 6
     };
     PLAYER_STATE myState;
@@ -30,6 +32,10 @@ private:
     int myCurrentSpriteIndex;
     float mySpriteTimerCurrent;
     float mySpriteTimerMax;
+
+    int myJumpLandSFX;
+    int mySlideSFX;
+    int myDieSFX;
 
     float myJumpTimerCurrent;
     const float myJumpTimerMax = 1.f;
