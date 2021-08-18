@@ -27,6 +27,7 @@ Logo::Logo(const char* imagePath, SDL_Renderer* aRenderer, const char* sfxPath, 
 Logo::~Logo(){
     SDL_DestroyTexture(image);
     image = nullptr;
+    AudioSystem::UnloadClip(sfx);
 }
 
 void Logo::Update(float deltaTime){
