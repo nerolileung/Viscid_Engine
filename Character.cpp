@@ -248,7 +248,7 @@ void Character::ChangeState(PLAYER_STATE aState){
                 myPosition.w *= 0.75f;
 
             // sfx
-            if (myState == PLAYER_STATE::JUMPING || myState == PLAYER_STATE::RUNNING_FALLING)
+            if (myState == PLAYER_STATE::JUMPING || myState == PLAYER_STATE::SLIDING || myState == PLAYER_STATE::RUNNING_FALLING)
                 AudioSystem::PlayClip(myJumpLandSFX);
         break;
         case PLAYER_STATE::RUNNING_FALLING:

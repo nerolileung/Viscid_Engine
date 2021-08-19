@@ -46,8 +46,7 @@ private:
     void UpdateBackgroundColour(float deltaTime);
     void BackgroundColourHSVToRGB();
 
-    int myBackgroundMusicBass;
-    int myBackgroundMusicClips[4];
+    int myBackgroundMusicClips[4][4];
     void UpdateBackgroundMusic();
 
     int myTileSize;

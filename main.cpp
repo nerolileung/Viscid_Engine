@@ -34,12 +34,20 @@ int main(int argc, char *argv[])
   }
 
   // initialise secondary sdl libraries
-  IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-  Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
+  int initialisedImgFlags = IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+  if ((initialisedImgFlags&(IMG_INIT_JPG|IMG_INIT_PNG)) != (IMG_INIT_JPG|IMG_INIT_PNG)) {
+    std::cout << "Failed to initialise JPG and PNG support! Error: " << IMG_GetError();
+  }
+
+  int initialisedMixFlags = Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG);
   if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
 		std::cout << "Failed to initialise SDL_mixer! Error: " << Mix_GetError();
 		return -3;
 	}
+  if ((initialisedMixFlags&(MIX_INIT_MP3|MIX_INIT_OGG)) != (MIX_INIT_MP3|MIX_INIT_OGG)) {
+    std::cout << "Failed to initialise MP3 and OGG support! Error: " << Mix_GetError();
+  }
+
   if (TTF_Init() < 0 ){
     std::cout << "Failed to initialise SDL_ttf! Error:" << TTF_GetError();
     return -4;

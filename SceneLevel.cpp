@@ -21,17 +21,15 @@ SceneLevel::SceneLevel(){
     BackgroundColourHSVToRGB();
 
     // initialise background music
-    myBackgroundMusicBass = AudioSystem::LoadClip("data/level_bgm_bass_slow.wav");
-    myBackgroundMusicClips[0] = AudioSystem::LoadClip("data/level_bgm_green_slow.wav");
-    myBackgroundMusicClips[1] = AudioSystem::LoadClip("data/level_bgm_cyan_slow.wav");
-    myBackgroundMusicClips[2] = AudioSystem::LoadClip("data/level_bgm_indigo_slow.wav");
-    myBackgroundMusicClips[3] = AudioSystem::LoadClip("data/level_bgm_purple_slow.wav");
-    
-    // use channels 0 and 1 for level bgm's bass and melody
-    AudioSystem::SetVolumeClips(AudioSystem::GetVolumeMusic(),0);
-    AudioSystem::SetVolumeClips(AudioSystem::GetVolumeMusic(),1);
-    AudioSystem::PlayClipFade(myBackgroundMusicBass, -1, 0);
-    AudioSystem::PlayClipFade(myBackgroundMusicClips[0], 0, 1);
+    myBackgroundMusicClips[0][0] = AudioSystem::LoadMusic("data/level_bgm_green_a.wav");
+    myBackgroundMusicClips[0][2] = AudioSystem::LoadMusic("data/level_bgm_green_a_fill.wav");
+    myBackgroundMusicClips[1][0] = AudioSystem::LoadMusic("data/level_bgm_cyan_a.wav");
+    myBackgroundMusicClips[1][2] = AudioSystem::LoadMusic("data/level_bgm_cyan_a_fill.wav");
+    myBackgroundMusicClips[2][0] = AudioSystem::LoadMusic("data/level_bgm_indigo_a.wav");
+    myBackgroundMusicClips[2][2] = AudioSystem::LoadMusic("data/level_bgm_indigo_a_fill.wav");
+    myBackgroundMusicClips[3][0] = AudioSystem::LoadMusic("data/level_bgm_purple_a.wav");
+    myBackgroundMusicClips[3][2] = AudioSystem::LoadMusic("data/level_bgm_purple_a_fill.wav");
+    AudioSystem::PlayMusicFade(myBackgroundMusicClips[0][0], 0);
     
     // initialise map
     myTileSize = Game::WindowHeight/8; // 8 tiles up, 9-32 tiles across (avg. 14)
@@ -195,7 +193,7 @@ bool SceneLevel::Update(float deltaTime){
         if (myControlInfoIndex > 2 || myControlInfoIndex < 0)
             mySpeed += (deltaTime * 0.01f);
             
-        myFinished = myPlayer->isDead(); // todo start delay to play ghost animation
+        myFinished = myPlayer->isDead();
     }
 
     // bgm keeps going; todo drop volume when paused
@@ -275,8 +273,8 @@ void SceneLevel::BackgroundColourHSVToRGB(){
 
 void SceneLevel::UpdateBackgroundMusic(){
     // play new clip if the previous one ended
-    if (Mix_Playing(1) == 0){
-        // pick different melody clip based on bg colour
+    if (!AudioSystem::IsMusicPlaying()){
+        // pick different base melody clip based on bg colour
         int melodyIndex = -1;
         if (myBackgroundColourHSV[0] < 120)
             melodyIndex = 0;
@@ -286,7 +284,15 @@ void SceneLevel::UpdateBackgroundMusic(){
             melodyIndex = 2;
         else melodyIndex = 3;
 
-        AudioSystem::PlayClip(myBackgroundMusicClips[melodyIndex], 0, 1);
+        // randomly pick melody variant a or b
+        int variant = 0;
+        //if (std::rand() % 2 == 0) variant++;
+
+        // use fill when speed hits a new stage
+        if (std::remainderf(mySpeed,1.f) < 0.01f)
+            variant+=2;
+        
+        AudioSystem::PlayMusic(myBackgroundMusicClips[melodyIndex][variant], 0);
     }
 }
 

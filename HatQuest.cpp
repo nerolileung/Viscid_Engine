@@ -48,7 +48,7 @@ HatQuest::~HatQuest(){
 bool HatQuest::Update(float deltaTime){
     // start playing bgm on first update after logos get displayed
     if (myCurrentSceneType == SCENES::MAIN_MENU && !AudioSystem::IsMusicPlaying())
-        AudioSystem::PlayMusic(menuBGM);
+        AudioSystem::PlayMusicFade(menuBGM);
     
 
     // move to new scene
@@ -121,7 +121,7 @@ void HatQuest::ChangeScene(SCENES newSceneType){
     }
     // level to menu music
     else if (myCurrentSceneType == PLAYING && newSceneType != PLAYING){
-        AudioSystem::PlayMusic(menuBGM);
+        AudioSystem::PlayMusicFade(menuBGM);
     }
     // set up new scene
     switch (newSceneType){

@@ -156,7 +156,7 @@ void AudioSystem::UnloadClip(int id){
     }
 }
 
-bool AudioSystem::PlayMusic(const char* filename){
+bool AudioSystem::PlayMusic(const char* filename, int loops){
     // check if this is a file we have
     if (musicFiles.count(filename) == 0)
         return false; // todo attempt to load file?
@@ -165,16 +165,36 @@ bool AudioSystem::PlayMusic(const char* filename){
         // todo account for music paused?
         StopMusic();
     }
-    Mix_FadeInMusic(musicFiles[filename], -1, 1000);
+    Mix_PlayMusic(musicFiles[filename], loops);
     return true;
 }
 
-bool AudioSystem::PlayMusic(int id){
+bool AudioSystem::PlayMusic(int id, int loops){
     // validate id
     if (id < 0 || id >= musicKeys.size())
         return false;
     // call filename overload
-    else return PlayMusic(musicKeys[id]);
+    else return PlayMusic(musicKeys[id], loops);
+}
+
+bool AudioSystem::PlayMusicFade(const char* filename, int loops){
+    // validate
+    if (musicFiles.count(filename) == 0)
+        return false;
+
+    if (Mix_PlayingMusic() == 0){
+        StopMusic();
+    }
+    Mix_FadeInMusic(musicFiles[filename], loops, 1000);
+    return true;
+}
+
+bool AudioSystem::PlayMusicFade(int id, int loops){
+    // validate id
+    if (id < 0 || id >= musicKeys.size())
+        return false;
+    // call filename overload
+    else return PlayMusicFade(musicKeys[id], loops);
 }
 
 // default is 0 loops, -1 will be infinite loops
