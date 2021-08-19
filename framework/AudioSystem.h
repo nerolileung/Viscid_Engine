@@ -11,9 +11,16 @@ public:
     static int LoadMusic(const char* filename);
     static int LoadClip(const char* filename);
 
+    static void UnloadMusic(const char* filename);
+    static void UnloadMusic(int id);
+
+    static void UnloadClip(const char* filename);
+    static void UnloadClip(int id);
+
     static bool PlayMusic(const char* filename);
     static bool PlayMusic(int id); // in case we want to use enums
 
+    static bool IsMusicPlaying();
     static void StopMusic();
 
     static bool PlayClip(const char* filename, int loops = 0, int channel = -1);
@@ -30,16 +37,14 @@ public:
     static int GetVolumeMusic() { return volumeMusicCurrent; };
     static int GetVolumeSFX(int channel = -1);
 
-    static bool IsMusicPlaying();
-
-    // todo unload audio functions for saving space
-
 private:
     static std::vector<const char*> musicKeys;
     static std::map<const char*, Mix_Music*> musicFiles;
+    static int musicKeyHead;
 
     static std::vector<const char*> clipKeys;
     static std::map<const char*, Mix_Chunk*> clipFiles;
+    static int clipKeyHead;
 
     static int volumeMasterCurrent;
     //static int volumeMasterPrevious;
