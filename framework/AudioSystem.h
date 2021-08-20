@@ -17,8 +17,10 @@ public:
     static void UnloadClip(const char* filename);
     static void UnloadClip(int id);
 
-    static bool PlayMusic(const char* filename);
-    static bool PlayMusic(int id); // in case we want to use enums
+    static bool PlayMusic(const char* filename, int loops = -1);
+    static bool PlayMusic(int id, int loops = -1); // int id in case we want to use enums
+    static bool PlayMusicFade(const char* filename, int loops = -1);
+    static bool PlayMusicFade(int id, int loops = -1);
 
     static bool IsMusicPlaying();
     static void StopMusic();
